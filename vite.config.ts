@@ -1,12 +1,14 @@
-
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode`.
-  // Use '.' instead of process.cwd() to avoid TS errors in some environments.
-  const env = loadEnv(mode, '.', 'VITE_');
+  // Fix: Define __dirname manually as it is not available in ESM environments
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+  // Fix: Cast process to any to bypass the error where 'cwd' is not found on type 'Process'
+  const env = loadEnv(mode, (process as any).cwd(), 'VITE_');
 
   return {
     base: '/',
@@ -17,8 +19,8 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        // Use path.resolve('.') as an alternative to avoid dependency on __dirname.
-        '@': path.resolve('.'),
+        // Fix: Use the manually defined __dirname for path resolution
+        '@': path.resolve(__dirname, '.'),
       },
     },
     build: {
@@ -26,9 +28,9 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     define: {
-      // Mapping process.env.API_KEY to targets to ensure compatibility
-      'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
-      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(process.env.API_KEY),
+      // Mapping the API Key so it's accessible in the browser context
+      'process.env.API_KEY': JSON.stringify((process as any).env.API_KEY || env.VITE_GEMINI_API_KEY || ''),
+      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify((process as any).env.API_KEY || env.VITE_GEMINI_API_KEY || '')
     },
   };
 });
