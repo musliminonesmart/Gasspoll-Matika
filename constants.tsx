@@ -279,3 +279,40 @@ export const TKA_QUESTION_META: Record<number, { topic: string; sub: string }> =
   };
   return acc;
 }, {} as Record<number, { topic: string; sub: string }>);
+
+// LICENSE CONFIGURATION
+export const LICENSE_CONFIG = {
+  enabled: true,
+  prefix: "GPM",             // prefix kode
+  deviceLock: true,          // ikat ke device
+  codeMinLength: 10,
+  maxAttempts: 5,
+  lockSeconds: 60,
+  // Jika kamu mau masa aktif:
+  expiryDays: 0,             // 0 = seumur hidup
+};
+
+export const DEVICE_KEY = "gpm_device_id_v1";
+
+export function getOrCreateDeviceId() {
+  try {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      id = crypto?.randomUUID ? crypto.randomUUID() : `dev_${Date.now()}_${Math.random()}`;
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
+  } catch {
+    // fallback kalau storage diblok
+    return `dev_${Date.now()}_${Math.random()}`;
+  }
+}
+
+export const SUPER_ADMIN = {
+  email: "Musliminonesmart@gmail.com",
+  waNumber: "6289670335578", // format internasional tanpa 0
+  waDisplay: "089670335578",
+  adminPinDefault: "2580",
+  // opsi: sembunyikan menu admin di UI
+  hideAdminMenu: true,
+};

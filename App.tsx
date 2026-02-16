@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AppState, Grade, Theme, Difficulty, StudentProfile, PracticeSession, TodoItem, TkaAnalysisData, PrintType, DailyStat, Badge, RamadanLevel, RamadanConfig } from './types';
-import { THEME_COLORS, RAMADAN_LEVELS, getLevelByPoints, RAMADAN_BADGES } from './constants';
+import { THEME_COLORS, RAMADAN_LEVELS, getLevelByPoints, RAMADAN_BADGES, LICENSE_CONFIG } from './constants';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import HomeView from './views/HomeView';
@@ -17,8 +16,14 @@ import RamadanRewardsView from './views/RamadanRewardsView';
 import PrintCenterView from './views/PrintCenterView';
 import ChatMatikaView from './views/ChatMatikaView';
 import PrintPreviewView from './views/PrintPreviewView';
+// Import License Services & View
+import { loadLicense, isExpired } from './utils/license';
+import LicenseGateView from './views/LicenseGateView';
 
 const App: React.FC = () => {
+  // License State
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
   const [state, setState] = useState<AppState>({
     view: 'home',
     profile: {
@@ -45,6 +50,17 @@ const App: React.FC = () => {
 
   const [session, setSession] = useState<PracticeSession | null>(null);
   const themeColors = THEME_COLORS[state.theme];
+
+  // License Check on Mount
+  useEffect(() => {
+    if (LICENSE_CONFIG.enabled) {
+      const lic = loadLicense();
+      const valid = lic.isActive && !isExpired(lic);
+      setIsAuthorized(valid);
+    } else {
+      setIsAuthorized(true);
+    }
+  }, []);
 
   // Persistence: Load
   useEffect(() => {
@@ -230,6 +246,15 @@ const App: React.FC = () => {
       default: return <HomeView navigate={navigate} theme={themeColors} profile={state.profile} />;
     }
   };
+
+  // LICENSE GATE RENDERING
+  if (isAuthorized === null) {
+    return <div className="min-h-screen bg-white" />; // Or a spinner
+  }
+
+  if (isAuthorized === false) {
+    return <LicenseGateView theme={themeColors} onActivated={() => setIsAuthorized(true)} />;
+  }
 
   return (
     <div className={`min-h-screen flex ${themeColors.bg}`}>
