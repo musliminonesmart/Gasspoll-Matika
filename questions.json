@@ -1,0 +1,272 @@
+{
+  "app": "GassPoll Matika",
+  "program": "TKA Kelas 6",
+  "version": "1.0",
+  "generated_at": "2024-03-24",
+  "rules": {
+    "all_multiple_choice": true,
+    "choices": ["A", "B", "C", "D"],
+    "explanation_style": "kid_friendly_5_blocks"
+  },
+  "topics": [
+    {"id": "OP", "name": "Operasi Bilangan"},
+    {"id": "FK", "name": "FPB & KPK"},
+    {"id": "PDP", "name": "Pecahan/Desimal/Persen"},
+    {"id": "PS", "name": "Perbandingan & Skala"},
+    {"id": "SK", "name": "Satuan & Konversi"},
+    {"id": "SJT", "name": "SJT & Debit"},
+    {"id": "BDL", "name": "Bangun Datar & Lingkaran"},
+    {"id": "BR", "name": "Bangun Ruang (Volume)"},
+    {"id": "KT", "name": "Koordinat & Transformasi"},
+    {"id": "SD", "name": "Statistika & Diagram"}
+  ],
+  "questions": [
+    {
+      "id": "TKA6-0001",
+      "topic_id": "OP",
+      "topic": "Operasi Bilangan",
+      "subtopic": "Bilangan Bulat Negatif",
+      "skill": "Penjumlahan bilangan bulat",
+      "difficulty": "mudah",
+      "stem": "Hasil dari -15 + 25 adalah...",
+      "choices": {
+        "A": "-10",
+        "B": "10",
+        "C": "-40",
+        "D": "40"
+      },
+      "answer": "B",
+      "answer_text": "10",
+      "explanation": "Ayo kita pahami dulu 😊: Bayangkan kamu punya utang 15 kelereng, lalu kamu mendapat 25 kelereng baru. Sisanya jadi milikmu! \n\nKunci konsepnya: Jika tanda berbeda, kurangi angka besar dengan angka kecil, lalu ikuti tanda angka yang lebih besar. \n\nLangkah cepat: 25 - 15 = 10. Karena 25 (positif) lebih besar dari 15, hasilnya positif. \n\nCek jawaban: 10 + 15 = 25. Cocok! \n\nTips biar gampang: Ingat utang dan bayar. Utang (-) dan Bayar (+).",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0002",
+      "topic_id": "OP",
+      "topic": "Operasi Bilangan",
+      "subtopic": "Operasi Campuran",
+      "skill": "Urutan hitung (Kabataku)",
+      "difficulty": "sedang",
+      "stem": "Hasil dari 120 + 40 x 2 - 50 adalah...",
+      "choices": {
+        "A": "270",
+        "B": "150",
+        "C": "100",
+        "D": "200"
+      },
+      "answer": "B",
+      "answer_text": "150",
+      "explanation": "Ayo kita pahami dulu 😊: Dalam matematika, ada antrean! Perkalian dan pembagian harus dikerjakan duluan sebelum tambah dan kurang. \n\nKunci konsepnya: KABATAKU (Kali, Bagi, Tambah, Kurang). \n\nLangkah cepat: 1) 40 x 2 = 80. 2) 120 + 80 = 200. 3) 200 - 50 = 150. \n\nCek jawaban: 120 + 80 - 50 = 200 - 50 = 150. \n\nTips biar gampang: Kasih kurung imajiner pada perkalian/pembagian biar nggak lupa dikerjakan duluan!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0121",
+      "topic_id": "FK",
+      "topic": "FPB & KPK",
+      "subtopic": "KPK",
+      "skill": "Menentukan KPK 2 bilangan",
+      "difficulty": "mudah",
+      "stem": "KPK dari 12 dan 18 adalah...",
+      "choices": {
+        "A": "6",
+        "B": "24",
+        "C": "36",
+        "D": "72"
+      },
+      "answer": "C",
+      "answer_text": "36",
+      "explanation": "Ayo kita pahami dulu 😊: KPK itu mencari angka terkecil yang bisa dibagi habis oleh 12 sekaligus 18. \n\nKunci konsepnya: Kelipatan Persekutuan Terkecil. \n\nLangkah cepat: Kelipatan 12: 12, 24, 36, ... Kelipatan 18: 18, 36, ... Angka pertama yang sama adalah 36! \n\nCek jawaban: 36 : 12 = 3. 36 : 18 = 2. Pas banget! \n\nTips biar gampang: Gunakan tabel sawah atau pohon faktor kalau angkanya besar.",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0122",
+      "topic_id": "FK",
+      "topic": "FPB & KPK",
+      "subtopic": "Soal Cerita KPK",
+      "skill": "Penerapan KPK pada jadwal",
+      "difficulty": "sedang",
+      "stem": "Lampu A menyala setiap 8 detik, Lampu B setiap 12 detik. Jika keduanya menyala bersama pada detik ke-0, detik keberapa mereka menyala bersama lagi?",
+      "choices": {
+        "A": "16 detik",
+        "B": "20 detik",
+        "C": "24 detik",
+        "D": "48 detik"
+      },
+      "answer": "C",
+      "answer_text": "24 detik",
+      "explanation": "Ayo kita pahami dulu 😊: Ini soal tentang pertemuan kembali. Kita perlu cari angka yang 'kenal' sama 8 dan 12. \n\nKunci konsepnya: Soal jadwal/waktu bersamaan biasanya pakai KPK. \n\nLangkah cepat: KPK dari 8 dan 12. Kelipatan 8: 8, 16, 24. Kelipatan 12: 12, 24. Hasilnya 24. \n\nCek jawaban: 24 bisa dibagi 8 (hasil 3) dan bisa dibagi 12 (hasil 2). \n\nTips biar gampang: Kata kunci 'bersama lagi' atau 'setiap... sekali' itu ciri khas KPK!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0211",
+      "topic_id": "PDP",
+      "topic": "Pecahan/Desimal/Persen",
+      "subtopic": "Operasi Pecahan",
+      "skill": "Penjumlahan pecahan beda penyebut",
+      "difficulty": "sedang",
+      "stem": "Hasil dari 3/4 + 1/2 adalah...",
+      "choices": {
+        "A": "4/6",
+        "B": "1",
+        "C": "1 1/4",
+        "D": "5/4"
+      },
+      "answer": "C",
+      "answer_text": "1 1/4",
+      "explanation": "Ayo kita pahami dulu 😊: Bayangkan kamu punya 3 potong pizza (dari total 4) lalu ditambah setengah pizza lagi. \n\nKunci konsepnya: Samakan penyebut dengan mencari KPK dari 4 dan 2. \n\nLangkah cepat: 1/2 diubah jadi 2/4. Maka 3/4 + 2/4 = 5/4. 5 dibagi 4 dapat 1 sisa 1, jadi 1 1/4. \n\nCek jawaban: 0,75 + 0,5 = 1,25. 1,25 sama dengan 1 1/4. \n\nTips biar gampang: Selalu samakan penyebut sebelum menjumlahkan pecahan biasa!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0212",
+      "topic_id": "PDP",
+      "topic": "Pecahan/Desimal/Persen",
+      "subtopic": "Persen",
+      "skill": "Menghitung diskon",
+      "difficulty": "sedang",
+      "stem": "Budi membeli tas seharga Rp 100.000 dengan diskon 15%. Berapa uang yang harus dibayar Budi?",
+      "choices": {
+        "A": "Rp 15.000",
+        "B": "Rp 85.000",
+        "C": "Rp 75.000",
+        "D": "Rp 115.000"
+      },
+      "answer": "B",
+      "answer_text": "Rp 85.000",
+      "explanation": "Ayo kita pahami dulu 😊: Diskon itu artinya potongan harga. Harga tasnya jadi lebih murah! \n\nKunci konsepnya: Diskon = Persen x Harga. Harga bayar = Harga awal - Potongan. \n\nLangkah cepat: 1) 15% dari 100.000 adalah 15.000. 2) 100.000 - 15.000 = 85.000. \n\nCek jawaban: 85.000 + 15.000 = 100.000. Betul! \n\nTips biar gampang: Persen itu per seratus. Jadi 15% artinya 15/100.",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0431",
+      "topic_id": "PS",
+      "topic": "Perbandingan & Skala",
+      "subtopic": "Skala Peta",
+      "skill": "Menghitung jarak sebenarnya",
+      "difficulty": "sedang",
+      "stem": "Jarak kota A ke B pada peta adalah 5 cm. Jika skala peta 1 : 200.000, maka jarak sebenarnya adalah...",
+      "choices": {
+        "A": "1 km",
+        "B": "10 km",
+        "0": "100 km",
+        "D": "20 km"
+      },
+      "answer": "B",
+      "answer_text": "10 km",
+      "explanation": "Ayo kita pahami dulu 😊: Peta itu versi kecil dari dunia nyata. Skala memberitahu kita seberapa besar dunia aslinya. \n\nKunci konsepnya: Jarak Sebenarnya = Jarak Peta x Skala. \n\nLangkah cepat: 1) 5 cm x 200.000 = 1.000.000 cm. 2) Ubah cm ke km (bagi 100.000) -> 1.000.000 : 100.000 = 10 km. \n\nCek jawaban: 10 km = 1.000.000 cm. Dibagi 200.000 hasilnya 5 cm. Cocok! \n\nTips biar gampang: Ingat tangga satuan! Dari cm ke km naik 5 tangga, jadi nolnya dibuang 5.",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0541",
+      "topic_id": "SK",
+      "topic": "Satuan & Konversi",
+      "subtopic": "Satuan Berat",
+      "skill": "Konversi Ton ke Kg",
+      "difficulty": "mudah",
+      "stem": "Hasil dari 2 ton + 500 kg adalah... kg",
+      "choices": {
+        "A": "700 kg",
+        "B": "2.500 kg",
+        "C": "502 kg",
+        "D": "2.050 kg"
+      },
+      "answer": "B",
+      "answer_text": "2.500 kg",
+      "explanation": "Ayo kita pahami dulu 😊: Ton dan kg adalah teman dekat. 1 ton itu beratnya sama dengan 1.000 kg. \n\nKunci konsepnya: 1 ton = 1.000 kg. \n\nLangkah cepat: 2 ton = 2.000 kg. Jadi, 2.000 kg + 500 kg = 2.500 kg. \n\nCek jawaban: 2.500 kg dikurangi 500 kg hasilnya 2.000 kg (2 ton). \n\nTips biar gampang: Bayangkan 1 gajah beratnya 1 ton (1.000 kg). Kalau 2 gajah berarti 2.000 kg!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0631",
+      "topic_id": "SJT",
+      "topic": "SJT & Debit",
+      "subtopic": "Kecepatan",
+      "skill": "Menghitung Jarak (S=V.t)",
+      "difficulty": "sedang",
+      "stem": "Sebuah mobil melaju dengan kecepatan 60 km/jam selama 2,5 jam. Jarak yang ditempuh mobil tersebut adalah...",
+      "choices": {
+        "A": "120 km",
+        "B": "150 km",
+        "C": "160 km",
+        "D": "180 km"
+      },
+      "answer": "B",
+      "answer_text": "150 km",
+      "explanation": "Ayo kita pahami dulu 😊: Mobil ini jalan terus selama dua jam setengah. Setiap satu jam dia menempuh 60 km. \n\nKunci konsepnya: Jarak = Kecepatan x Waktu. \n\nLangkah cepat: 60 x 2,5. Bisa hitung 60 x 2 = 120, lalu 60 x 0,5 = 30. 120 + 30 = 150 km. \n\nCek jawaban: 150 km dibagi 60 km/jam hasilnya 2,5 jam. Pas! \n\nTips biar gampang: Hafalkan segitiga J-K-W (Jarak di atas, Kecepatan dan Waktu di bawah).",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0721",
+      "topic_id": "BDL",
+      "topic": "Bangun Datar & Lingkaran",
+      "subtopic": "Lingkaran",
+      "skill": "Menghitung Luas Lingkaran",
+      "difficulty": "sedang",
+      "stem": "Luas lingkaran yang memiliki jari-jari 7 cm adalah... (π = 22/7)",
+      "choices": {
+        "A": "44 cm²",
+        "B": "88 cm²",
+        "C": "154 cm²",
+        "D": "616 cm²"
+      },
+      "answer": "C",
+      "answer_text": "154 cm²",
+      "explanation": "Ayo kita pahami dulu 😊: Luas itu menghitung seluruh area di dalam lingkaran. \n\nKunci konsepnya: Luas Lingkaran = π x r x r. \n\nLangkah cepat: (22/7) x 7 x 7. Coret angka 7 yang di bawah dengan salah satu angka 7 di atas. Tersisa 22 x 7 = 154. \n\nCek jawaban: 154 dibagi 22 hasilnya 7. Betul! \n\nTips biar gampang: Kalau jari-jari bisa dibagi 7, selalu pakai π = 22/7 biar gampang coret-coretnya!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0861",
+      "topic_id": "BR",
+      "topic": "Bangun Ruang (Volume)",
+      "subtopic": "Volume Balok",
+      "skill": "Menghitung Volume Balok",
+      "difficulty": "sedang",
+      "stem": "Volume sebuah balok yang panjangnya 10 cm, lebar 5 cm, dan tinggi 8 cm adalah...",
+      "choices": {
+        "A": "23 cm³",
+        "B": "50 cm³",
+        "C": "400 cm³",
+        "D": "800 cm³"
+      },
+      "answer": "C",
+      "answer_text": "400 cm³",
+      "explanation": "Ayo kita pahami dulu 😊: Volume itu seperti mengisi air ke dalam kotak sampai penuh. \n\nKunci konsepnya: Volume Balok = Panjang x Lebar x Tinggi. \n\nLangkah cepat: 10 x 5 x 8 = 50 x 8 = 400. \n\nCek jawaban: 400 dibagi (10x5) hasilnya 8. Cocok! \n\nTips biar gampang: Ingat saja P-L-T (Paling Luar Tinggi). Kalikan semua sisinya!",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0931",
+      "topic_id": "KT",
+      "topic": "Koordinat & Transformasi",
+      "subtopic": "Koordinat Kartesius",
+      "skill": "Membaca titik koordinat",
+      "difficulty": "mudah",
+      "stem": "Titik A terletak pada 3 satuan ke kanan dan 4 satuan ke atas dari titik pusat (0,0). Koordinat titik A adalah...",
+      "choices": {
+        "A": "(4, 3)",
+        "B": "(3, 4)",
+        "C": "(-3, 4)",
+        "D": "(3, -4)"
+      },
+      "answer": "B",
+      "answer_text": "(3, 4)",
+      "explanation": "Ayo kita pahami dulu 😊: Koordinat itu seperti alamat rumah. Jalan dulu (horizontal), baru naik/turun (vertikal). \n\nKunci konsepnya: Koordinat (x, y). x untuk kanan(+)/kiri(-), y untuk atas(+)/bawah(-). \n\nLangkah cepat: Kanan 3 berarti x=3. Atas 4 berarti y=4. Jadi (3, 4). \n\nCek jawaban: Kalau (4,3) berarti kanannya 4. Beda ya! \n\nTips biar gampang: Ingat 'Jalan dulu baru Naik tangga'.",
+      "tags": ["kelas6", "tka", "pg"]
+    },
+    {
+      "id": "TKA6-0971",
+      "topic_id": "SD",
+      "topic": "Statistika & Diagram",
+      "subtopic": "Rata-rata (Mean)",
+      "skill": "Menghitung rata-rata sederhana",
+      "difficulty": "sedang",
+      "stem": "Nilai ulangan matematika Andi adalah 70, 80, 90, dan 80. Rata-rata nilai Andi adalah...",
+      "choices": {
+        "A": "75",
+        "B": "80",
+        "C": "85",
+        "D": "320"
+      },
+      "answer": "B",
+      "answer_text": "80",
+      "explanation": "Ayo kita pahami dulu 😊: Rata-rata itu seperti membagi adil semua nilai ke setiap ulangan. \n\nKunci konsepnya: Rata-rata = Jumlah Data : Banyak Data. \n\nLangkah cepat: 1) Jumlah = 70 + 80 + 90 + 80 = 320. 2) Banyak data = 4. 3) 320 : 4 = 80. \n\nCek jawaban: 80 x 4 = 320. Pas! \n\nTips biar gampang: Kalau ada angka yang sering muncul dan angkanya seimbang di tengah, biasanya rata-ratanya sekitar situ.",
+      "tags": ["kelas6", "tka", "pg"]
+    }
+  ]
+}
