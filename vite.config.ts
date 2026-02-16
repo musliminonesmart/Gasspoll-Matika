@@ -4,20 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 export default defineConfig(({ mode }) => {
-  // Fix: Define __dirname manually as it is not available in ESM environments
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-  // Load env file based on `mode` in the current working directory.
-  // Using path.resolve('.') as a type-safe way to get the current working directory in Node.js environments.
   const env = loadEnv(mode, path.resolve('.'), '');
 
   return {
     base: '/',
     plugins: [react()],
-    server: {
-      port: 3000,
-      host: '0.0.0.0',
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -29,8 +21,7 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,
     },
     define: {
-      // This ensures process.env.API_KEY is available in the browser.
-      // We prioritize the actual process.env (Vercel) then falling back to loaded env.
+      // Memastikan process.env.API_KEY tersedia di browser tanpa error "process is not defined"
       'process.env.API_KEY': JSON.stringify(process.env.API_KEY || env.VITE_GEMINI_API_KEY || env.API_KEY || ''),
     },
   };
