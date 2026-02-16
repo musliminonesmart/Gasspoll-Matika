@@ -1,9 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
-
 import { Question, Grade, Difficulty, ChatMessage } from "../types";
 
-// initialize API client
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+// The API key is obtained from process.env.API_KEY which is defined in vite.config.ts
+const ai = new GoogleGenAI({ 
+  apiKey: process.env.API_KEY 
+});
 
 export async function sendChatMatikaMessage(
   history: ChatMessage[],
@@ -59,7 +60,6 @@ export async function sendChatMatikaMessage(
         parts: [{ text: h.text }]
       }));
 
-    // Use ai.models.generateContent for querying GenAI with model and prompt
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: [
@@ -72,7 +72,6 @@ export async function sendChatMatikaMessage(
       }
     });
 
-    // Access .text property directly from response
     return response.text || "Maaf Kak Chat Matika sedang tidak bisa menjawab. Coba lagi ya!";
   } catch (error: any) {
     console.error("Gemini Chat Error:", error);
@@ -111,7 +110,6 @@ export async function generateQuestions(grade: Grade, topic: string, difficulty:
         }
       }
     });
-    // response.text is a property, not a method
     return JSON.parse(response.text || "[]");
   } catch (error) { return []; }
 }
