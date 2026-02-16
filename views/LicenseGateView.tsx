@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { getOrCreateDeviceId } from "../utils/device";
 import { activateLicense, loadLicense, isExpired } from "../utils/license";
 import { SUPER_ADMIN } from "../constants";
+import { Check, Copy, CheckCircle2, AlertCircle, MessageCircle, Lock, Sparkles, Brain, Clock, ShieldCheck, Heart, Star, Users } from 'lucide-react';
 
 type Props = {
   theme: any;
@@ -47,154 +48,243 @@ export default function LicenseGateView({ theme, onActivated }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40">
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-          {/* LEFT: Hero Image + Value */}
-          <div className="space-y-6">
+    <div className="min-h-screen bg-[#FAFAFA] font-sans text-slate-800">
+      {/* Decorative Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-blue-100/50 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-purple-100/50 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 py-8 md:py-12">
+        {/* LOGO HEADER */}
+        <div className="flex items-center gap-3 mb-8 md:mb-12">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">
+            G
+          </div>
+          <span className="text-xl font-black text-slate-800 tracking-tight">GassPoll Matika</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+          
+          {/* LEFT COLUMN: LANDING PAGE CONTENT (Scrollable) */}
+          <div className="lg:col-span-7 space-y-12 md:space-y-16 pb-10">
             
-            {/* HEADLINE & HOOK */}
-            <div className="space-y-3 pb-2">
-               <h1 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none">
-                 GASSPOLL <span className="text-blue-600">MATIKA</span>
+            {/* 1. HERO SECTION */}
+            <div className="space-y-6 animate-in slide-in-from-left duration-700">
+               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-widest border border-orange-200">
+                  <Heart size={14} className="fill-orange-500 text-orange-500" /> Aplikasi Belajar Bersama Ortu
+               </div>
+               
+               <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
+                 Bantu Anak Pintar Matematika <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Tanpa Drama</span> & Tanpa Les Mahal.
                </h1>
-               <p className="text-lg md:text-2xl font-bold text-gray-600 leading-snug">
-                 "Rahasia Anak Pintar Matematika Tanpa Les Mahal! 🚀 Bikin Belajar Jadi Seru, Nilai Ujian Langsung Melesat."
+               
+               <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl">
+                 "Bingung ngajarin PR anak karena cara hitung beda dengan zaman dulu? GassPoll Matika hadir sebagai <span className="font-bold text-slate-800">Asisten Pribadi Ayah Bunda</span> untuk membimbing anak belajar mandiri."
                </p>
+
+               {/* Hero Image */}
+               <div className="rounded-[2rem] overflow-hidden border border-slate-200 shadow-2xl shadow-slate-200 relative group">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
+                  <img
+                    src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1974&auto=format&fit=crop"
+                    alt="Ayah Bunda Mengajar Anak"
+                    className="w-full h-64 md:h-80 object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                  />
+                  <div className="absolute bottom-6 left-6 right-6 z-20 text-white">
+                     <p className="font-bold text-lg mb-1">⭐ Terbukti Efektif</p>
+                     <p className="text-sm opacity-90">Anak jadi lebih percaya diri menghadapi ulangan harian & ujian sekolah.</p>
+                  </div>
+               </div>
             </div>
 
-            <div className="rounded-[2.5rem] overflow-hidden border bg-white shadow-sm relative group">
-               {/* Decorative Overlay */}
-               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10"></div>
-              <img
-                src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop"
-                alt="GassPoll Matika - Kids Style"
-                className="w-full h-64 md:h-80 object-cover transform group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute bottom-6 left-8 text-white z-20">
-                 <p className="text-sm font-bold opacity-90 uppercase tracking-widest mb-1 shadow-black/20 drop-shadow-md">Premium Access</p>
-                 <p className="text-3xl font-black shadow-black/20 drop-shadow-md">Belajar Makin Seru!</p>
+            {/* 2. PAIN POINTS (Why Parents Need This) */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="h-[2px] w-10 bg-slate-200"></div>
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">KENAPA GASSPOLL?</h3>
+              </div>
+              
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800">Sering Mengalami Ini, Bun?</h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-6 bg-white rounded-3xl border border-red-100 shadow-sm hover:shadow-md transition-shadow">
+                   <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-4"><Brain size={20} /></div>
+                   <h4 className="font-bold text-slate-800 mb-2">Kurikulum Berubah Terus</h4>
+                   <p className="text-sm text-slate-500 leading-relaxed">Bingung cara jelasin materi karena metode di sekolah beda dengan cara kita dulu.</p>
+                </div>
+                <div className="p-6 bg-white rounded-3xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
+                   <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mb-4"><Clock size={20} /></div>
+                   <h4 className="font-bold text-slate-800 mb-2">Waktu Terbatas</h4>
+                   <p className="text-sm text-slate-500 leading-relaxed">Sibuk kerja atau urus rumah, jadi tidak sempat mendampingi anak belajar full time.</p>
+                </div>
+                <div className="p-6 bg-white rounded-3xl border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                   <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4"><Users size={20} /></div>
+                   <h4 className="font-bold text-slate-800 mb-2">Biaya Les Mahal</h4>
+                   <p className="text-sm text-slate-500 leading-relaxed">Biaya bimbel privat semakin tinggi, tapi hasil nilai anak belum tentu maksimal.</p>
+                </div>
+                <div className="p-6 bg-white rounded-3xl border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
+                   <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 mb-4"><Sparkles size={20} /></div>
+                   <h4 className="font-bold text-slate-800 mb-2">Anak Kecanduan HP</h4>
+                   <p className="text-sm text-slate-500 leading-relaxed">Susah lepas dari gadget. Solusinya? Ubah gadget jadi alat belajar yang seru!</p>
+                </div>
               </div>
             </div>
 
-            <div className="rounded-[2.5rem] border bg-white p-6 md:p-7 shadow-sm">
-              <div className="text-sm md:text-base font-black text-gray-900">
-                Yang kamu dapat di Premium:
-              </div>
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                <div className="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 font-medium flex items-center gap-2">
-                  <span>✅</span> Materi Kelas 4–6 SD
+            {/* 3. SOLUTION & FEATURES */}
+            <div className="space-y-6">
+              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden">
+                <div className="relative z-10 space-y-6">
+                   <h2 className="text-2xl md:text-3xl font-black">Solusi Cerdas: 1 Aplikasi untuk Semua Kebutuhan 🚀</h2>
+                   
+                   <div className="space-y-4">
+                      <div className="flex gap-4">
+                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
+                            <CheckCircle2 className="text-green-400" />
+                         </div>
+                         <div>
+                            <h4 className="font-bold text-lg">Materi & Rumus Praktis</h4>
+                            <p className="text-slate-300 text-sm">Ringkasan materi Kelas 4-6 SD yang mudah dipahami anak, lengkap dengan cara cepat.</p>
+                         </div>
+                      </div>
+                      <div className="flex gap-4">
+                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
+                            <MessageCircle className="text-blue-400" />
+                         </div>
+                         <div>
+                            <h4 className="font-bold text-lg">Chat Matika (AI Tutor)</h4>
+                            <p className="text-slate-300 text-sm">Anak bisa bertanya soal kapan saja 24 jam. Dijelaskan langkah demi langkah seperti guru privat.</p>
+                         </div>
+                      </div>
+                      <div className="flex gap-4">
+                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
+                            <Star className="text-yellow-400" />
+                         </div>
+                         <div>
+                            <h4 className="font-bold text-lg">Mode Ramadan & Ibadah</h4>
+                            <p className="text-slate-300 text-sm">Tidak cuma pintar angka, tapi juga sholeh. Pantau sholat dan puasa anak dengan gamifikasi seru.</p>
+                         </div>
+                      </div>
+                   </div>
                 </div>
-                <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 font-medium flex items-center gap-2">
-                  <span>🧩</span> Latihan Santai (Soal PG)
-                </div>
-                <div className="rounded-2xl bg-amber-50 border border-amber-100 p-4 font-medium flex items-center gap-2">
-                  <span>🏁</span> Try Out TKA + Nilai
-                </div>
-                <div className="rounded-2xl bg-purple-50 border border-purple-100 p-4 font-medium flex items-center gap-2">
-                  <span>⏱️</span> Timer Latihan Disiplin
-                </div>
-                <div className="rounded-2xl bg-teal-50 border border-teal-100 p-4 font-medium flex items-center gap-2">
-                  <span>📌</span> Rumus Praktis (Print A4)
-                </div>
-                <div className="rounded-2xl bg-pink-50 border border-pink-100 p-4 font-medium flex items-center gap-2">
-                  <span>🌙</span> To Do Ramadan + Sertifikat
-                </div>
-              </div>
-
-              <div className="mt-4 text-xs text-gray-500 text-center bg-gray-50 p-3 rounded-xl border border-dashed border-gray-200">
-                🔒 Lisensi terikat 1 perangkat untuk keamanan & kualitas akses.
+                
+                {/* Abstract shapes */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -ml-16 -mb-16"></div>
               </div>
             </div>
+
+             {/* 4. TESTIMONIAL / TRUST */}
+             <div className="bg-blue-50 border border-blue-100 rounded-[2rem] p-8 text-center space-y-4">
+                <div className="flex justify-center gap-1">
+                   {[1,2,3,4,5].map(i => <Star key={i} size={20} className="fill-yellow-400 text-yellow-400" />)}
+                </div>
+                <p className="text-slate-700 font-medium italic text-lg">
+                   "Alhamdulillah sejak pakai GassPoll, saya jadi tenang. Anak belajar mandiri, nilai ujiannya naik drastis. Fitur Chat Matika-nya membantu banget buat jelasin PR!"
+                </p>
+                <div>
+                   <p className="font-black text-slate-900">Bunda Anisa</p>
+                   <p className="text-xs font-bold text-slate-500 uppercase">Orang Tua Murid Kelas 5 SD</p>
+                </div>
+             </div>
+
           </div>
 
-          {/* RIGHT: Activation Card */}
-          <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-6 md:p-8 space-y-6 top-10 sticky">
-            <div className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-3xl shadow-sm">
-                🔐
-              </div>
-              <h2 className={`text-2xl md:text-3xl font-black ${theme?.text || "text-gray-900"}`}>
-                Aktivasi Member
-              </h2>
-              <p className="text-sm text-gray-500 px-4">
-                Masukkan <b>Kode Member</b> untuk membuka semua fitur Premium GassPoll Matika.
-              </p>
-            </div>
-
-            {(lic?.isActive && !expired) && (
-              <div className="p-4 rounded-2xl bg-green-50 border border-green-100 text-green-800 text-sm font-bold text-center">
-                ✅ Akun ini sudah aktif. Selamat belajar ya!
-              </div>
-            )}
-
-            {expired && (
-              <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-red-800 text-sm font-bold text-center">
-                ⛔ Masa aktif habis. Hubungi admin untuk perpanjang.
-              </div>
-            )}
-
-            {msg && (
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100 text-amber-900 text-sm font-bold text-center animate-pulse">
-                {msg}
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <div className="space-y-1">
-                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Kode Member</label>
-                 <input
-                   value={code}
-                   onChange={(e) => setCode(e.target.value.toUpperCase())}
-                   placeholder="GPM-XXXX-XXXX-XXXX"
-                   className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 text-center font-mono font-bold text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-300 transition-all placeholder:text-gray-300"
-                 />
-              </div>
-
-              <button
-                onClick={submit}
-                className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-200 hover:shadow-blue-300 transform transition-all active:scale-95"
-              >
-                🚀 Aktifkan Sekarang
-              </button>
-
-              <p className="text-xs text-center text-gray-400">
-                Belum punya kode? Kirim <b>Device ID</b> ke admin.
-              </p>
-            </div>
-
-            {/* Device ID Box */}
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 relative overflow-hidden">
-              <div className="flex items-start justify-between gap-3 relative z-10">
-                <div className="overflow-hidden">
-                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Device ID Anda</div>
-                  <div className="text-sm font-mono font-bold text-gray-700 break-all mt-1 leading-tight">{deviceId}</div>
+          {/* RIGHT COLUMN: STICKY ACTIVATION FORM */}
+          <div className="lg:col-span-5 relative">
+            <div className="sticky top-8 space-y-6">
+              
+              <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 p-8 md:p-10 space-y-8 relative overflow-hidden ring-1 ring-slate-900/5">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+                
+                <div className="text-center space-y-2">
+                  <div className="inline-flex items-center justify-center p-3 bg-blue-50 rounded-2xl text-blue-600 mb-2 shadow-inner">
+                    <Lock size={28} />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-800">Aktivasi Member</h2>
+                  <p className="text-slate-500 text-sm px-2 leading-relaxed">
+                    Investasi terbaik untuk masa depan anak. Masukkan kode lisensi untuk memulai.
+                  </p>
                 </div>
 
+                {/* Status Messages */}
+                <div className="space-y-4">
+                  {(lic?.isActive && !expired) && (
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-bold text-center flex items-center justify-center gap-2">
+                      <CheckCircle2 size={18} /> Akun Aktif! Selamat Belajar.
+                    </div>
+                  )}
+
+                  {expired && (
+                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-sm font-bold text-center flex items-center justify-center gap-2">
+                      <AlertCircle size={18} /> Masa aktif habis. Perpanjang yuk!
+                    </div>
+                  )}
+
+                  {msg && (
+                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100 text-amber-900 text-sm font-bold text-center animate-pulse flex items-center justify-center gap-2">
+                      <AlertCircle size={18} /> {msg}
+                    </div>
+                  )}
+                </div>
+
+                {/* Form Input */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kode Lisensi</label>
+                    <input
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.toUpperCase())}
+                      placeholder="GPM-XXXX-XXXX-XXXX"
+                      className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-center font-mono font-bold text-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder:text-slate-300 text-slate-700"
+                    />
+                  </div>
+
+                  <button
+                    onClick={submit}
+                    className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg shadow-xl shadow-blue-200 hover:shadow-blue-300 transform transition-all active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    🚀 Aktifkan Sekarang
+                  </button>
+                </div>
+
+                {/* Device ID Info */}
+                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 relative group">
+                   <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Device ID Anda</span>
+                      <button onClick={copyDeviceId} className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:text-blue-700 transition-colors">
+                         {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Tersalin!" : "Salin"}
+                      </button>
+                   </div>
+                   <div className="font-mono text-xs font-bold text-slate-600 break-all bg-white p-3 rounded-xl border border-slate-200">
+                     {deviceId}
+                   </div>
+                   <p className="text-[10px] text-slate-400 mt-2 text-center">
+                     Kirim ID ini ke admin untuk mendapatkan kode aktivasi.
+                   </p>
+                </div>
+
+                {/* WhatsApp Button */}
                 <button
-                  onClick={copyDeviceId}
-                  className={`shrink-0 px-4 py-2 rounded-xl border text-xs font-black transition-all ${copied ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+                  onClick={openWhatsApp}
+                  className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-green-200 transition-all"
                 >
-                  {copied ? "✅ Copied" : "📋 Copy"}
+                  <MessageCircle size={20} /> Beli Lisensi via WhatsApp
                 </button>
-              </div>
-            </div>
 
-            {/* WhatsApp CTA */}
-            <button
-              onClick={openWhatsApp}
-              className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all"
-            >
-              💬 Beli Kode via WhatsApp
-            </button>
+                {/* Footer */}
+                <div className="text-center pt-2 space-y-1">
+                   <div className="flex justify-center items-center gap-2 text-slate-400">
+                      <ShieldCheck size={14} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Garansi Kepuasan & Keamanan</span>
+                   </div>
+                   <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">GassPoll Matika • Made with ❤️ by Kak Mus</p>
+                </div>
 
-            {/* Trust / Footer */}
-            <div className="pt-6 border-t border-gray-100 text-center space-y-1">
-              <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">
-                GassPoll Matika • Made with ❤️ by Kak Mus
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
