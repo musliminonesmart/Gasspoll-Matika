@@ -1,11 +1,9 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
+
 import { Question, Grade, Difficulty, ChatMessage } from "../types";
 
 // Always initialize GoogleGenAI using a named parameter with process.env.API_KEY
-const ai = new GoogleGenAI({ 
-  apiKey: process.env.API_KEY 
-});
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export async function sendChatMatikaMessage(
   history: ChatMessage[],
