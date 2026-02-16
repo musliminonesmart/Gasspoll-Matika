@@ -1,11 +1,10 @@
-
 import React, { useMemo, useState } from 'react';
 import { PrintType, StudentProfile, PracticeSession, TodoItem, Grade } from '../types';
 import { FORMULAS } from '../constants';
 import { ArrowLeft, Printer, ShieldCheck, Star, Target, CheckCircle, Loader2, Download, FileText, ImageIcon, QrCode, Sparkles, Moon, Calendar, Trophy, Flame, Award } from 'lucide-react';
-// External libraries for DOM-to-File conversion
-import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
-import { jsPDF } from 'https://esm.sh/jspdf@2.5.1';
+// Correct local imports for bundling
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface PrintPreviewViewProps {
   type: PrintType;
@@ -29,7 +28,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
   const isLandscape = type === 'sertifikat';
 
   const handleExport = async (format: 'pdf' | 'png' | 'jpg') => {
-    // We target .print-page for export to ensure we get the full resolution A4
     const pages = document.querySelectorAll('.print-page');
     if (pages.length === 0) return;
 
@@ -48,7 +46,7 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
 
         for (let i = 0; i < pages.length; i++) {
           const canvas = await html2canvas(pages[i] as HTMLElement, {
-            scale: 2, // High resolution capture
+            scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
@@ -83,25 +81,17 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
     }
   };
 
-  /**
-   * Official PageWrapper with Scaling for Mobile Preview
-   */
   const PageWrapper = ({ children, isLandscape = false }: { children?: React.ReactNode, isLandscape?: boolean }) => (
     <div className={`print-scale ${isLandscape ? 'landscape' : 'portrait'}`}>
       <div className={`print-page ${isLandscape ? 'landscape' : 'portrait'}`}>
-        {/* Watermark - Subtle Background */}
         <div className="watermark">
           <div className="watermark-text">
             GASSPOLL<br/>MATIKA
           </div>
         </div>
-
-        {/* Content Section */}
         <div className="print-content">
           {children}
         </div>
-
-        {/* Official Footer - Flows normally to prevent mobile clipping */}
         <div className="print-footer">
           🌙 GassPoll Matika • by Kak Mus ⭐
         </div>
@@ -124,7 +114,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Kelas {printPayload.student.grade} - {printPayload.student.school}</p>
                   </div>
                </div>
-
                <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-2xl border text-center">
                     <p className="text-[9pt] font-black text-gray-400 uppercase">Mulai 1 Ram.</p>
@@ -139,7 +128,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     <p className="text-sm font-black">{printPayload.summary.level}</p>
                   </div>
                </div>
-
                <div className="space-y-4">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                      <FileText size={14} /> Tabel Capaian Ibadah Harian
@@ -171,7 +159,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     </table>
                   </div>
                </div>
-
                <div className="mt-auto grid grid-cols-2 gap-10 avoid-break">
                   <div className="space-y-2">
                      <p className="text-[9pt] font-black text-gray-400 uppercase tracking-widest text-center">Tanda Tangan Anak</p>
@@ -200,7 +187,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     <p className="text-sm font-bold text-gray-400 uppercase">Kelas {printPayload.student.class} - {printPayload.student.school}</p>
                   </div>
                </div>
-
                <div className="grid grid-cols-3 gap-6">
                   <div className="p-6 bg-yellow-50 rounded-3xl border-2 border-yellow-100 text-center space-y-1">
                      <p className="text-3xl font-black text-yellow-600">{printPayload.summary.points}</p>
@@ -215,7 +201,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                      <p className="text-[10px] font-black text-blue-400 uppercase">Level Juara</p>
                   </div>
                </div>
-
                <div className="space-y-4">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] flex items-center gap-2">
                      <Award size={14} /> Pencapaian Badge Terbaru
@@ -230,12 +215,10 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                      ))}
                   </div>
                </div>
-
                <div className="mt-auto p-8 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 text-center space-y-3">
                   <p className="text-lg font-black text-gray-700 italic">"{printPayload.motivation}"</p>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Besok kita naik level lagi ya 😊</p>
                </div>
-
                <div className="flex justify-between items-end px-4 avoid-break">
                   <div className="text-left space-y-1">
                      <p className="text-[9pt] font-black text-gray-400 uppercase tracking-widest">Diterbitkan Pada</p>
@@ -257,7 +240,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                <div className="text-center border-b-4 border-purple-800 pb-6 space-y-2">
                   <h1 className="text-3xl font-black uppercase tracking-[0.2em] text-purple-900">{printPayload.docTitle}</h1>
                   <p className="text-sm font-bold text-purple-400 uppercase tracking-widest">{printPayload.appBrand}</p>
-                  
                   <div className="flex justify-between items-end mt-4 px-2">
                     <div className="text-left space-y-1">
                        <p className="text-[10px] font-black text-gray-400 uppercase">Nama: <b className="text-gray-800">{printPayload.student.name}</b></p>
@@ -271,7 +253,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     </div>
                   </div>
                </div>
-
                {printPayload.ramadanInfo && (
                  <div className="p-3 bg-gray-50 border rounded-xl flex justify-between items-center text-[9pt] avoid-break">
                     <div className="flex gap-4">
@@ -281,7 +262,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     <Moon size={14} className="text-purple-300" />
                  </div>
                )}
-
                <div className="grid grid-cols-1 gap-8">
                   {printPayload.sections.map((section: any, idx: number) => (
                     <div key={idx} className="space-y-4 avoid-break">
@@ -304,7 +284,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     </div>
                   ))}
                </div>
-
                <div className="mt-8 space-y-4 avoid-break">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Catatan & Pencapaian Hari Ini</h3>
                   <div className="space-y-4 pt-2">
@@ -315,14 +294,12 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     <div className="h-[1px] bg-gray-100 w-full"></div>
                   </div>
                </div>
-
                <div className="mt-auto pt-10 text-center avoid-break">
                   <p className="text-[10pt] text-gray-300 font-bold italic uppercase tracking-[0.4em]">"Setiap amalan kecil punya balasan besar. Tetap GassPoll!"</p>
                </div>
             </div>
           </PageWrapper>
         );
-
       case 'materi':
         if (!printPayload) return null;
         return (
@@ -336,14 +313,12 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                    <span>Sekolah: <b className="text-gray-800">{printPayload.student.school || '---'}</b></span>
                 </div>
               </div>
-
               <div className="space-y-2">
                  <h2 className="text-3xl font-black text-blue-600 font-kids text-center">{printPayload.topicTitle}</h2>
                  <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 italic text-sm text-center text-blue-900">
                     {printPayload.intro}
                  </div>
               </div>
-
               <div className="space-y-4">
                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] flex items-center gap-2">
                     <Star size={14} className="text-yellow-500 fill-yellow-500" /> Rumus Praktis Utama
@@ -358,7 +333,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     ))}
                  </div>
               </div>
-
               <div className="p-6 bg-green-50/50 rounded-[2rem] border-2 border-green-100 space-y-4 avoid-break">
                  <h3 className="text-xs font-black text-green-600 uppercase tracking-[0.3em] flex items-center gap-2">
                     <Sparkles size={14} /> Contoh Soal Cepat
@@ -378,7 +352,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
             </div>
           </PageWrapper>
         );
-
       case 'rumus':
         const formulas = FORMULAS[profile.grade] || [];
         return (
@@ -392,7 +365,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                    <span>Sekolah: <b className="text-gray-900">{profile.school || '---'}</b></span>
                 </div>
               </div>
-              
               <div className="grid grid-cols-1 gap-6">
                 {formulas.map((f, i) => (
                   <div key={i} className="p-6 border-2 border-gray-100 rounded-3xl space-y-3 bg-white avoid-break">
@@ -413,7 +385,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
             </div>
           </PageWrapper>
         );
-
       case 'hasil':
         if (!lastSession) return null;
         const total = lastSession.questions.length;
@@ -427,7 +398,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                   <h1 className="text-3xl font-black uppercase tracking-widest text-gray-900">Laporan Hasil Try Out</h1>
                   <p className="text-lg font-bold text-gray-800">Simulasi Ujian TKA - GassPoll Matika</p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-8 border-b pb-8">
                    <div className="space-y-1">
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Data Siswa</p>
@@ -442,7 +412,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                       <p className="text-xs font-bold mt-2 text-gray-400 uppercase tracking-widest">TGL: {new Date().toLocaleDateString()}</p>
                    </div>
                 </div>
-
                 <div className="space-y-4">
                    <h3 className="text-lg font-black border-l-4 border-black pl-3 uppercase tracking-wider">Analisa Soal (1-5)</h3>
                    <div className="grid grid-cols-1 gap-2">
@@ -492,7 +461,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
             </PageWrapper>
           </>
         );
-
       case 'sertifikat':
         if (!lastSession) return null;
         const s = Math.round((lastSession.results.correct.length / lastSession.questions.length) * 100);
@@ -501,11 +469,9 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
         else if (s >= 80) achievement = { title: 'SANGAT MEMUASKAN', stars: 4, color: 'text-blue-600' };
         else if (s >= 70) achievement = { title: 'SANGAT BAIK', stars: 3, color: 'text-green-600' };
         else if (s >= 60) achievement = { title: 'BAIK', stars: 2, color: 'text-orange-600' };
-
         const certTheme = profile.grade === Grade.K4 ? { border: 'border-[#91C788]', accent: 'text-[#91C788]' } 
                         : profile.grade === Grade.K5 ? { border: 'border-[#C5A059]', accent: 'text-[#C5A059]' } 
                         : { border: 'border-[#1e3a8a]', accent: 'text-[#1e3a8a]' };
-
         return (
           <PageWrapper isLandscape={true}>
              <div className={`h-full w-full border-[10mm] ${certTheme.border} p-10 flex flex-col items-center justify-between text-center relative bg-white box-border`}>
@@ -514,13 +480,11 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                   <h1 className="text-4xl font-black uppercase tracking-[0.2em] text-gray-800 font-serif">Sertifikat Prestasi</h1>
                   <p className="text-lg font-bold italic text-gray-500">Diberikan kepada siswa berprestasi:</p>
                 </div>
-
                 <div className="space-y-2 relative z-10 avoid-break">
                   <h2 className={`text-6xl font-black ${certTheme.accent} font-kids`}>{profile.name || 'Siswa Berprestasi'}</h2>
                   <div className={`h-1 bg-gray-100 w-full max-w-lg mx-auto`}></div>
                   <p className="text-lg font-bold text-gray-700 tracking-widest uppercase">Siswa Kelas {profile.grade} - {profile.school || 'Sekolah Dasar'}</p>
                 </div>
-
                 <div className="max-w-3xl relative z-10 space-y-4 avoid-break">
                   <div className="flex flex-col items-center gap-2">
                      <div className="flex gap-1">
@@ -535,21 +499,18 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                     Akurasi: {s}%, Benar: {lastSession.results.correct.length}, Salah: {lastSession.results.wrong.length}.
                   </p>
                 </div>
-
                 <div className="w-full flex justify-between items-end relative z-10 px-10 avoid-break">
                   <div className="text-left space-y-1">
                     <p className="text-[9pt] font-black text-gray-400 uppercase tracking-widest">Diterbitkan Pada</p>
                     <p className="font-bold text-base">{new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <p className="text-[8pt] text-gray-300 font-mono tracking-tighter">ID: {certId}</p>
                   </div>
-                  
                   <div className="flex flex-col items-center">
                     <div className={`h-16 w-56 border-b-2 ${certTheme.border} flex items-center justify-center italic text-2xl font-kids text-gray-700 opacity-90`}>
                       Kak Mus
                     </div>
                     <p className="text-[8pt] font-black mt-2 text-gray-500 tracking-[0.3em] uppercase">GassPoll Matika</p>
                   </div>
-
                   <div className="flex flex-col items-center gap-1">
                     <div className="p-1.5 bg-white border border-gray-100 rounded-lg shadow-sm">
                       <QrCode size={60} className="text-gray-800" />
@@ -562,7 +523,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
              </div>
           </PageWrapper>
         );
-
       default: return null;
     }
   };
@@ -570,7 +530,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
   return (
     <div className="print-preview-shell min-h-screen bg-gray-900/10 backdrop-blur-md fixed inset-0 z-50 no-print overflow-hidden">
       <div className="h-full flex flex-col">
-        {/* UI Controls Header */}
         <div className="w-full bg-white p-4 md:p-6 shadow-md border-b z-30 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <button 
@@ -586,7 +545,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">A4 Scale Preview Active</p>
             </div>
           </div>
-
           <div className="flex flex-wrap justify-center gap-2 md:gap-3">
              <button 
                onClick={() => handleExport('pdf')}
@@ -596,7 +554,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                {isExporting === 'pdf' ? <Loader2 className="animate-spin" size={16} /> : <FileText size={16} />}
                Simpan PDF
              </button>
-             
              <button 
                onClick={() => handleExport('png')}
                disabled={!!isExporting}
@@ -605,7 +562,6 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
                {isExporting === 'png' ? <Loader2 className="animate-spin" size={16} /> : <ImageIcon size={16} />}
                Simpan PNG
              </button>
-
              <button 
                onClick={() => handleExport('jpg')}
                disabled={!!isExporting}
@@ -616,220 +572,37 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
              </button>
           </div>
         </div>
-
-        {/* Preview Scroll Area with Auto Scaling */}
         <div className="print-preview-scroll flex-1 overflow-auto bg-gray-900/5 p-4 md:p-10 scroll-smooth">
           <div className="document-container flex flex-col items-center gap-8 w-full" id="printArea">
             {renderDocument()}
           </div>
         </div>
       </div>
-
       <style>{`
-        /* 1) SCREEN VIEW STYLES */
-        .print-preview-shell {
-          width: 100%;
-          height: 100%;
-        }
-
-        .print-preview-scroll {
-          width: 100%;
-          height: calc(100vh - 90px);
-          overflow: auto;
-          padding: 12px;
-          box-sizing: border-box;
-        }
-
-        .print-scale {
-          margin: 0 auto;
-          width: 210mm;
-          height: auto;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .print-scale.landscape {
-          width: 297mm;
-        }
-
-        .print-page {
-          width: 210mm;
-          min-height: 297mm;
-          background: #fff;
-          margin: 0 auto;
-          border-radius: 16px;
-          box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-          padding: 14mm 12mm 22mm 12mm; /* Consistent A4 padding */
-          box-sizing: border-box;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          overflow: visible !important;
-        }
-
-        .landscape .print-page {
-          width: 297mm;
-          min-height: 210mm;
-        }
-
-        .print-content {
-          position: relative;
-          z-index: 1;
-          flex: 1;
-          width: 100%;
-          overflow: visible !important;
-          page-break-inside: auto;
-        }
-
-        .print-footer {
-          margin-top: 10mm;
-          padding-top: 3mm;
-          border-top: 1px solid #E5E7EB;
-          font-weight: 700;
-          font-size: 11pt;
-          text-align: center;
-          color: #4B5563;
-          position: static !important; /* Flow normally to prevent clipping */
-        }
-
-        .watermark {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%) rotate(-12deg);
-          width: 72%;
-          opacity: 0.06;
-          z-index: 0;
-          pointer-events: none;
-          text-align: center;
-        }
-
-        .watermark-text {
-          font-size: 80pt;
-          font-weight: 900;
-          line-height: 1;
-          text-transform: uppercase;
-          color: #6B7280;
-        }
-
-        .avoid-break {
-          break-inside: avoid !important;
-          page-break-inside: avoid !important;
-        }
-
-        /* Responsive Auto-Scaling for Mobile Preview */
+        .print-preview-shell { width: 100%; height: 100%; }
+        .print-preview-scroll { width: 100%; height: calc(100vh - 90px); overflow: auto; padding: 12px; box-sizing: border-box; }
+        .print-scale { margin: 0 auto; width: 210mm; height: auto; display: flex; flex-direction: column; }
+        .print-scale.landscape { width: 297mm; }
+        .print-page { width: 210mm; min-height: 297mm; background: #fff; margin: 0 auto; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); padding: 14mm 12mm 22mm 12mm; box-sizing: border-box; position: relative; display: flex; flex-direction: column; overflow: visible !important; }
+        .landscape .print-page { width: 297mm; min-height: 210mm; }
+        .print-content { position: relative; z-index: 1; flex: 1; width: 100%; overflow: visible !important; page-break-inside: auto; }
+        .print-footer { margin-top: 10mm; padding-top: 3mm; border-top: 1px solid #E5E7EB; font-weight: 700; font-size: 11pt; text-align: center; color: #4B5563; position: static !important; }
+        .watermark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-12deg); width: 72%; opacity: 0.06; z-index: 0; pointer-events: none; text-align: center; }
+        .watermark-text { font-size: 80pt; font-weight: 900; line-height: 1; text-transform: uppercase; color: #6B7280; }
+        .avoid-break { break-inside: avoid !important; page-break-inside: avoid !important; }
         @media (max-width: 768px) {
-          .print-scale:not(.landscape) {
-            transform-origin: top center;
-            transform: scale(0.62);
-            width: 210mm;
-            margin: 0 auto;
-          }
-          .print-scale.landscape {
-            transform-origin: top center;
-            transform: scale(0.48);
-            width: 297mm;
-            margin: 0 auto;
-          }
+          .print-scale:not(.landscape) { transform-origin: top center; transform: scale(0.62); width: 210mm; margin: 0 auto; }
+          .print-scale.landscape { transform-origin: top center; transform: scale(0.48); width: 297mm; margin: 0 auto; }
         }
-
-        @media (max-width: 420px) {
-          .print-scale:not(.landscape) {
-            transform: scale(0.55);
-          }
-          .print-scale.landscape {
-            transform: scale(0.4);
-          }
-        }
-
-        /* 2) PRINT MODE (PHYSICAL PAPER) */
         @media print {
-          @page {
-            size: A4 portrait;
-            margin: 14mm 12mm 16mm 12mm; /* Custom margins */
-          }
-
-          .landscape @page {
-            size: A4 landscape;
-          }
-
-          html, body {
-            height: auto !important;
-            min-height: auto !important;
-            overflow: visible !important;
-            background: white !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-
-          * {
-            box-shadow: none !important;
-            filter: none !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-
-          .print-preview-scroll {
-            overflow: visible !important;
-            height: auto !important;
-            padding: 0 !important;
-          }
-
-          .print-scale {
-            transform: none !important; /* Disable scaling for real print */
-            width: auto !important;
-            margin: 0 !important;
-          }
-
-          .print-page {
-            width: 100% !important;
-            min-height: 297mm !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 14mm 12mm 22mm 12mm !important;
-            border: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            position: relative !important;
-            overflow: visible !important;
-            page-break-after: always !important;
-          }
-
-          .print-content {
-            overflow: visible !important;
-          }
-
-          .print-footer {
-            margin-top: 10mm !important;
-            padding-top: 3mm !important;
-            border-top: 1px solid #E5E7EB !important;
-            font-size: 10.5pt !important;
-            font-weight: 700 !important;
-            color: #4B5563 !important;
-            text-align: center !important;
-            position: static !important;
-            display: block !important;
-          }
-        }
-
-        /* Safe text wrapping */
-        .print-page * {
-          max-width: 100%;
-          box-sizing: border-box;
-        }
-
-        .print-page h1, .print-page h2, .print-page h3 {
-          word-break: break-word;
-          overflow-wrap: anywhere;
-        }
-
-        .print-page .formula, .print-page .big-formula {
-          text-align: center;
-          white-space: normal;
-          word-break: break-word;
-          overflow-wrap: anywhere;
+          @page { size: A4 portrait; margin: 14mm 12mm 16mm 12mm; }
+          .landscape @page { size: A4 landscape; }
+          html, body { height: auto !important; min-height: auto !important; overflow: visible !important; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .no-print { display: none !important; }
+          .print-preview-scroll { overflow: visible !important; height: auto !important; padding: 0 !important; }
+          .print-scale { transform: none !important; width: auto !important; margin: 0 !important; }
+          .print-page { width: 100% !important; min-height: 297mm !important; height: auto !important; margin: 0 !important; padding: 14mm 12mm 22mm 12mm !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; position: relative !important; overflow: visible !important; page-break-after: always !important; }
+          .print-footer { margin-top: 10mm !important; padding-top: 3mm !important; border-top: 1px solid #E5E7EB !important; font-size: 10.5pt !important; font-weight: 700 !important; color: #4B5563 !important; text-align: center !important; position: static !important; display: block !important; }
         }
       `}</style>
     </div>
