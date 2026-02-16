@@ -85,14 +85,14 @@ export default function LicenseGateView({ theme, onActivated }: Props) {
 
                {/* Hero Image */}
                <div className="rounded-[2rem] overflow-hidden border border-slate-200 shadow-2xl shadow-slate-200 relative group">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
                   <img
-                    src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1974&auto=format&fit=crop"
-                    alt="Ayah Bunda Mengajar Anak"
-                    className="w-full h-64 md:h-80 object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                    src="https://images.unsplash.com/photo-1610484826967-09c5720778c7?q=80&w=2070&auto=format&fit=crop"
+                    className="w-full h-auto block max-h-[420px] sm:max-h-[520px] object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                    alt="Anak dan Orang Tua Belajar Aplikasi GassPoll Matika"
                   />
                   <div className="absolute bottom-6 left-6 right-6 z-20 text-white">
-                     <p className="font-bold text-lg mb-1">⭐ Terbukti Efektif</p>
+                     <p className="font-bold text-lg mb-1 flex items-center gap-2">⭐ Metode Smart & Fun</p>
                      <p className="text-sm opacity-90">Anak jadi lebih percaya diri menghadapi ulangan harian & ujian sekolah.</p>
                   </div>
                </div>
@@ -131,47 +131,31 @@ export default function LicenseGateView({ theme, onActivated }: Props) {
               </div>
             </div>
 
-            {/* 3. SOLUTION & FEATURES */}
-            <div className="space-y-6">
-              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden">
-                <div className="relative z-10 space-y-6">
-                   <h2 className="text-2xl md:text-3xl font-black">Solusi Cerdas: 1 Aplikasi untuk Semua Kebutuhan 🚀</h2>
-                   
-                   <div className="space-y-4">
-                      <div className="flex gap-4">
-                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                            <CheckCircle2 className="text-green-400" />
-                         </div>
-                         <div>
-                            <h4 className="font-bold text-lg">Materi & Rumus Praktis</h4>
-                            <p className="text-slate-300 text-sm">Ringkasan materi Kelas 4-6 SD yang mudah dipahami anak, lengkap dengan cara cepat.</p>
-                         </div>
-                      </div>
-                      <div className="flex gap-4">
-                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                            <MessageCircle className="text-blue-400" />
-                         </div>
-                         <div>
-                            <h4 className="font-bold text-lg">Chat Matika (AI Tutor)</h4>
-                            <p className="text-slate-300 text-sm">Anak bisa bertanya soal kapan saja 24 jam. Dijelaskan langkah demi langkah seperti guru privat.</p>
-                         </div>
-                      </div>
-                      <div className="flex gap-4">
-                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                            <Star className="text-yellow-400" />
-                         </div>
-                         <div>
-                            <h4 className="font-bold text-lg">Mode Ramadan & Ibadah</h4>
-                            <p className="text-slate-300 text-sm">Tidak cuma pintar angka, tapi juga sholeh. Pantau sholat dan puasa anak dengan gamifikasi seru.</p>
-                         </div>
-                      </div>
-                   </div>
-                </div>
+            {/* 3. PREMIUM FEATURES GRID */}
+            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-400"></div>
                 
-                {/* Abstract shapes */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -ml-16 -mb-16"></div>
-              </div>
+                <div className="text-sm sm:text-[15px] font-black text-gray-900 flex items-center gap-2 mb-2">
+                   <Sparkles className="text-blue-600" size={18} /> Yang kamu dapat di Premium:
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                   {[
+                     { title: "Materi Kelas 4-6 SD Lengkap", icon: "📚", color: "bg-blue-50 text-blue-700" },
+                     { title: "Latihan Soal Unlimited", icon: "📝", color: "bg-green-50 text-green-700" },
+                     { title: "Chat AI Tutor (24 Jam)", icon: "🤖", color: "bg-purple-50 text-purple-700" },
+                     { title: "Try Out & Analisa Nilai", icon: "📊", color: "bg-orange-50 text-orange-700" },
+                     { title: "Mode Ramadan & Ibadah", icon: "🌙", color: "bg-teal-50 text-teal-700" },
+                     { title: "Cetak Sertifikat & Rapor", icon: "🖨️", color: "bg-red-50 text-red-700" },
+                   ].map((item, i) => (
+                     <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all group">
+                        <div className={`w-10 h-10 rounded-full ${item.color} flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition-transform`}>
+                           {item.icon}
+                        </div>
+                        <span className="font-bold text-slate-700 leading-tight">{item.title}</span>
+                     </div>
+                   ))}
+                </div>
             </div>
 
              {/* 4. TESTIMONIAL / TRUST */}
@@ -236,32 +220,38 @@ export default function LicenseGateView({ theme, onActivated }: Props) {
                       value={code}
                       onChange={(e) => setCode(e.target.value.toUpperCase())}
                       placeholder="GPM-XXXX-XXXX-XXXX"
-                      className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-center font-mono font-bold text-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder:text-slate-300 text-slate-700"
+                      className="w-full px-4 py-3.5 rounded-2xl border focus:outline-none focus:ring-2 focus:ring-blue-200 text-base border-slate-100 bg-slate-50 text-center font-mono font-bold text-xl placeholder:text-slate-300 text-slate-700"
                     />
                   </div>
 
                   <button
                     onClick={submit}
-                    className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg shadow-xl shadow-blue-200 hover:shadow-blue-300 transform transition-all active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-base shadow-xl shadow-blue-200 hover:shadow-blue-300 transform transition-all active:scale-95 flex items-center justify-center gap-2"
                   >
                     🚀 Aktifkan Sekarang
                   </button>
                 </div>
 
-                {/* Device ID Info */}
-                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 relative group">
-                   <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Device ID Anda</span>
-                      <button onClick={copyDeviceId} className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:text-blue-700 transition-colors">
-                         {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Tersalin!" : "Salin"}
-                      </button>
-                   </div>
-                   <div className="font-mono text-xs font-bold text-slate-600 break-all bg-white p-3 rounded-xl border border-slate-200">
-                     {deviceId}
-                   </div>
-                   <p className="text-[10px] text-slate-400 mt-2 text-center">
+                {/* Device ID Info - Updated to User Specification */}
+                <div className="rounded-2xl border bg-gray-50 p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs font-black text-gray-600">Device ID Anda</div>
+                      <div className="text-sm font-mono text-gray-900 break-all mt-1">
+                        {deviceId}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={copyDeviceId}
+                      className="w-full sm:w-auto px-3 py-2 rounded-xl bg-white border hover:bg-gray-50 text-sm font-black"
+                    >
+                      {copied ? "✅ Copied" : "📋 Copy"}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-2 text-center">
                      Kirim ID ini ke admin untuk mendapatkan kode aktivasi.
-                   </p>
+                  </p>
                 </div>
 
                 {/* WhatsApp Button */}
