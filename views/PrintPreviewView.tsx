@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { PrintType, StudentProfile, PracticeSession, TodoItem, Grade } from '../types';
 import { FORMULAS } from '../constants';
 import { ArrowLeft, Printer, ShieldCheck, Star, Target, CheckCircle, Loader2, Download, FileText, ImageIcon, QrCode, Sparkles, Moon, Calendar, Trophy, Flame, Award } from 'lucide-react';
-// Correct local imports for bundling
-import html2canvas from 'html2canvas';
+import { toPng, toJpeg } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
 interface PrintPreviewViewProps {
@@ -18,6 +17,7 @@ interface PrintPreviewViewProps {
 
 const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profile, lastSession, ramadanTodos, printPayload, onBack }) => {
   const [isExporting, setIsExporting] = useState<string | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const certId = useMemo(() => {
     const year = new Date().getFullYear();
@@ -25,51 +25,76 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
     return `GP-TKA-${year}-${profile.grade}-${rand}`;
   }, [profile.grade]);
 
-  const isLandscape = type === 'sertifikat';
+  // A4 size in pixels at 96 DPI approx
+  const A4_PX = { w: 794, h: 1123 };
+
+  // Wait for fonts to load before exporting
+  async function waitFontsReady() {
+    // @ts-ignore
+    if (document.fonts && document.fonts.ready) {
+       // @ts-ignore
+       await document.fonts.ready;
+    } else {
+       await new Promise((r) => setTimeout(r, 500));
+    }
+  }
 
   const handleExport = async (format: 'pdf' | 'png' | 'jpg') => {
-    const pages = document.querySelectorAll('.print-page');
-    if (pages.length === 0) return;
-
+    if (!printRef.current) return;
     setIsExporting(format);
 
     try {
+      await waitFontsReady();
+
+      // Find all print pages
+      const pages = Array.from(printRef.current.querySelectorAll('.print-page'));
+      if (pages.length === 0) return;
+
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const baseFilename = `GassPollMatika_${type}_${profile.name.replace(/\s+/g, '_')}_${dateStr}`;
 
+      const commonOpts = {
+        cacheBust: true,
+        pixelRatio: 2, // High resolution
+        backgroundColor: '#ffffff'
+      };
+
       if (format === 'pdf') {
         const pdf = new jsPDF({
-          orientation: isLandscape ? 'landscape' : 'portrait',
-          unit: 'mm',
+          orientation: type === 'sertifikat' ? 'landscape' : 'portrait',
+          unit: 'pt',
           format: 'a4',
         });
 
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+
         for (let i = 0; i < pages.length; i++) {
-          const canvas = await html2canvas(pages[i] as HTMLElement, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-          });
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const pageEl = pages[i] as HTMLElement;
+          const dataUrl = await toPng(pageEl, { ...commonOpts, width: pageEl.offsetWidth, height: pageEl.offsetHeight });
           
           if (i > 0) pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+          
+          // Adjust image to fit PDF page
+          pdf.addImage(dataUrl, 'PNG', 0, 0, pageW, pageH);
         }
         pdf.save(`${baseFilename}.pdf`);
-      } else {
-        const canvas = await html2canvas(pages[0] as HTMLElement, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-        });
+      } 
+      else {
+        // For single image export, we only take the first page usually, or we could stitch them.
+        // For now, let's just export the first page for PNG/JPG
+        const pageEl = pages[0] as HTMLElement;
         const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-        const imgData = canvas.toDataURL(mimeType, format === 'jpg' ? 0.92 : undefined);
+        
+        let dataUrl;
+        if (format === 'png') {
+           dataUrl = await toPng(pageEl, commonOpts);
+        } else {
+           dataUrl = await toJpeg(pageEl, { ...commonOpts, quality: 0.95 });
+        }
+
         const link = document.createElement('a');
-        link.href = imgData;
+        link.href = dataUrl;
         link.download = `${baseFilename}.${format}`;
         link.click();
       }
@@ -92,7 +117,7 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
         <div className="print-content">
           {children}
         </div>
-        <div className="print-footer">
+        <div data-hide-on-export="true" className="print-footer">
           🌙 GassPoll Matika • by Kak Mus ⭐
         </div>
       </div>
@@ -573,7 +598,7 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
           </div>
         </div>
         <div className="print-preview-scroll flex-1 overflow-auto bg-gray-900/5 p-4 md:p-10 scroll-smooth">
-          <div className="document-container flex flex-col items-center gap-8 w-full" id="printArea">
+          <div ref={printRef} className="document-container flex flex-col items-center gap-8 w-full" id="printArea">
             {renderDocument()}
           </div>
         </div>
@@ -595,14 +620,14 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
           .print-scale.landscape { transform-origin: top center; transform: scale(0.48); width: 297mm; margin: 0 auto; }
         }
         @media print {
-          @page { size: A4 portrait; margin: 14mm 12mm 16mm 12mm; }
+          @page { size: A4 portrait; margin: 0; }
           .landscape @page { size: A4 landscape; }
           html, body { height: auto !important; min-height: auto !important; overflow: visible !important; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
           .print-preview-scroll { overflow: visible !important; height: auto !important; padding: 0 !important; }
           .print-scale { transform: none !important; width: auto !important; margin: 0 !important; }
           .print-page { width: 100% !important; min-height: 297mm !important; height: auto !important; margin: 0 !important; padding: 14mm 12mm 22mm 12mm !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; position: relative !important; overflow: visible !important; page-break-after: always !important; }
-          .print-footer { margin-top: 10mm !important; padding-top: 3mm !important; border-top: 1px solid #E5E7EB !important; font-size: 10.5pt !important; font-weight: 700 !important; color: #4B5563 !important; text-align: center !important; position: static !important; display: block !important; }
+          .print-footer { display: none !important; }
         }
       `}</style>
     </div>

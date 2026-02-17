@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { getOrCreateDeviceId } from "../utils/device";
 import { activateLicense, loadLicense, isExpired } from "../utils/license";
 import { SUPER_ADMIN } from "../constants";
-import { Check, Copy, CheckCircle2, AlertCircle, MessageCircle, Lock, Sparkles, Brain, Clock, ShieldCheck, Heart, Star, Users } from 'lucide-react';
+import { CheckCircle2, AlertCircle, MessageCircle, Lock, Sparkles, Brain, Clock, ShieldCheck, Heart, Star, Users } from 'lucide-react';
 
 type Props = {
   theme: any;
@@ -87,9 +87,9 @@ export default function LicenseGateView({ theme, onActivated }: Props) {
                <div className="rounded-[2rem] overflow-hidden border border-slate-200 shadow-2xl shadow-slate-200 relative group">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
                   <img
-                    src="https://images.unsplash.com/photo-1610484826967-09c5720778c7?q=80&w=2070&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=2069&auto=format&fit=crop"
                     className="w-full h-auto block max-h-[420px] sm:max-h-[520px] object-cover transform group-hover:scale-105 transition-transform duration-1000"
-                    alt="Anak dan Orang Tua Belajar Aplikasi GassPoll Matika"
+                    alt="Anak Belajar Matematika Bersama Orang Tua"
                   />
                   <div className="absolute bottom-6 left-6 right-6 z-20 text-white">
                      <p className="font-bold text-lg mb-1 flex items-center gap-2">⭐ Metode Smart & Fun</p>

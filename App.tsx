@@ -1,6 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { AppState, Grade, Theme, Difficulty, StudentProfile, PracticeSession, TodoItem, TkaAnalysisData, PrintType, DailyStat, Badge, RamadanLevel, RamadanConfig } from './types';
-import { THEME_COLORS, RAMADAN_LEVELS, getLevelByPoints, RAMADAN_BADGES, LICENSE_CONFIG } from './constants';
+import React, { useState, useEffect } from 'react';
+import {
+  AppState,
+  Grade,
+  Theme,
+  StudentProfile,
+  PracticeSession,
+  TodoItem,
+  PrintType,
+  DailyStat,
+  Badge,
+  RamadanConfig
+} from './types';
+
+import { THEME_COLORS, RAMADAN_BADGES, LICENSE_CONFIG, getLevelByPoints } from './constants';
+
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import HomeView from './views/HomeView';
@@ -16,13 +29,17 @@ import RamadanRewardsView from './views/RamadanRewardsView';
 import PrintCenterView from './views/PrintCenterView';
 import ChatMatikaView from './views/ChatMatikaView';
 import PrintPreviewView from './views/PrintPreviewView';
-// Import License Services & View
+
+// License
 import { loadLicense, isExpired } from './utils/license';
 import LicenseGateView from './views/LicenseGateView';
 
 const App: React.FC = () => {
   // License State
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  // IMPORTANT: store previous view for print preview back
+  const [prevView, setPrevView] = useState<AppState['view']>('home');
 
   const [state, setState] = useState<AppState>({
     view: 'home',
@@ -49,6 +66,7 @@ const App: React.FC = () => {
   const [unlockedPopup, setUnlockedPopup] = useState<{ type: "level" | "badge"; title: string; desc: string } | null>(null);
 
   const [session, setSession] = useState<PracticeSession | null>(null);
+
   const themeColors = THEME_COLORS[state.theme];
 
   // License Check on Mount
@@ -129,7 +147,7 @@ const App: React.FC = () => {
 
   const recalculateRewards = (progress: Record<string, TodoItem[]>) => {
     let totalPoints = 0;
-    let currentLevel = getLevelByPoints(ramadanPointsTotal);
+    const currentLevel = getLevelByPoints(ramadanPointsTotal);
     const newStats: Record<string, DailyStat> = {};
 
     const dates = Object.keys(progress).sort();
@@ -143,7 +161,7 @@ const App: React.FC = () => {
     let perfectWajibDays = 0;
 
     dates.forEach(date => {
-      const dayTodos = progress[date];
+      const dayTodos = progress[date] || [];
       const wajibItems = dayTodos.filter(t => t.task.includes('[WAJIB]'));
       const targetItems = dayTodos.filter(t => t.task.includes('[TARGET]'));
 
@@ -155,7 +173,7 @@ const App: React.FC = () => {
 
       const dailyPoints = wajibDone * 5 + targetDone * 3;
       const bonusPoints = (wajibPerfect ? 10 : 0) + (targetBonus ? 5 : 0);
-      
+
       newStats[date] = {
         wajibDone, wajibTotal: wajibItems.length,
         targetDone, targetTotal: targetItems.length,
@@ -216,76 +234,196 @@ const App: React.FC = () => {
     setRamadanBadges(newBadges);
   };
 
+  // OPEN PRINT PREVIEW (store previous page for back button)
   const openPrintPreview = (type: PrintType, payload?: any) => {
+    setPrevView(state.view);
     setState(prev => ({ ...prev, view: 'printPreview', printType: type, printPayload: payload }));
   };
 
   const finishSession = (finalSession: PracticeSession) => {
     setSession(finalSession);
     if (state.view === 'tryout') {
-        setState(prev => ({...prev, lastTryOutResult: finalSession}));
+      setState(prev => ({ ...prev, lastTryOutResult: finalSession }));
     }
     setState(prev => ({ ...prev, view: 'result' }));
   };
 
   const renderView = () => {
     switch (state.view) {
-      case 'home': return <HomeView navigate={navigate} theme={themeColors} profile={state.profile} />;
-      case 'profile': return <ProfileView profile={state.profile} onSave={updateProfile} theme={themeColors} />;
-      case 'theme': return <ThemeView currentTheme={state.theme} onSelect={updateTheme} theme={themeColors} />;
-      case 'material': return <MaterialView grade={state.profile.grade} theme={themeColors} profile={state.profile} onOpenPrint={openPrintPreview} />;
-      case 'practice': return <PracticeView grade={state.profile.grade} onFinish={finishSession} theme={themeColors} />;
-      case 'tryout': return <TryOutView grade={state.profile.grade} onFinish={finishSession} theme={themeColors} profile={state.profile} />;
-      case 'result': return <ResultView session={session} theme={themeColors} profile={state.profile} navigate={navigate} />;
-      case 'certificate': return <CertificateView session={state.lastTryOutResult} theme={themeColors} profile={state.profile} />;
-      case 'ramadan': return <RamadanView progress={ramadanProgress} updateProgress={updateRamadanData} dailyStats={dailyStats} points={ramadanPointsTotal} streak={ramadanStreak} level={getLevelByPoints(ramadanPointsTotal).name} theme={themeColors} profile={state.profile} ramadanConfig={state.ramadanConfig} onUpdateConfig={updateRamadanConfig} navigate={navigate} onOpenPrint={openPrintPreview} />;
-      case 'ramadan_rewards': return <RamadanRewardsView points={ramadanPointsTotal} streak={ramadanStreak} bestStreak={ramadanBestStreak} badges={ramadanBadges} profile={state.profile} onOpenPrint={openPrintPreview} theme={themeColors} />;
-      case 'print': return <PrintCenterView theme={themeColors} profile={state.profile} lastSession={state.lastTryOutResult || null} onOpenPrint={openPrintPreview} />;
-      case 'chat_matika': return <ChatMatikaView theme={themeColors} profile={state.profile} />;
-      case 'printPreview': return <PrintPreviewView type={state.printType!} theme={themeColors} profile={state.profile} lastSession={state.lastTryOutResult || null} ramadanTodos={[]} printPayload={state.printPayload} onBack={() => navigate('ramadan')} />;
-      default: return <HomeView navigate={navigate} theme={themeColors} profile={state.profile} />;
+      case 'home':
+        return <HomeView navigate={navigate} theme={themeColors} profile={state.profile} />;
+
+      case 'profile':
+        return <ProfileView profile={state.profile} onSave={updateProfile} theme={themeColors} />;
+
+      case 'theme':
+        return <ThemeView currentTheme={state.theme} onSelect={updateTheme} theme={themeColors} />;
+
+      case 'material':
+        return <MaterialView grade={state.profile.grade} theme={themeColors} profile={state.profile} onOpenPrint={openPrintPreview} />;
+
+      case 'practice':
+        return <PracticeView grade={state.profile.grade} onFinish={finishSession} theme={themeColors} />;
+
+      case 'tryout':
+        return <TryOutView grade={state.profile.grade} onFinish={finishSession} theme={themeColors} profile={state.profile} />;
+
+      case 'result':
+        return <ResultView session={session} theme={themeColors} profile={state.profile} navigate={navigate} />;
+
+      case 'certificate':
+        return <CertificateView session={state.lastTryOutResult} theme={themeColors} profile={state.profile} />;
+
+      case 'ramadan':
+        return (
+          <RamadanView
+            progress={ramadanProgress}
+            updateProgress={updateRamadanData}
+            dailyStats={dailyStats}
+            points={ramadanPointsTotal}
+            streak={ramadanStreak}
+            level={getLevelByPoints(ramadanPointsTotal).name}
+            theme={themeColors}
+            profile={state.profile}
+            ramadanConfig={state.ramadanConfig}
+            onUpdateConfig={updateRamadanConfig}
+            navigate={navigate}
+            onOpenPrint={openPrintPreview}
+          />
+        );
+
+      case 'ramadan_rewards':
+        return (
+          <RamadanRewardsView
+            points={ramadanPointsTotal}
+            streak={ramadanStreak}
+            bestStreak={ramadanBestStreak}
+            badges={ramadanBadges}
+            profile={state.profile}
+            onOpenPrint={openPrintPreview}
+            theme={themeColors}
+          />
+        );
+
+      case 'print':
+        return (
+          <PrintCenterView
+            theme={themeColors}
+            profile={state.profile}
+            lastSession={state.lastTryOutResult || null}
+            onOpenPrint={openPrintPreview}
+          />
+        );
+
+      case 'chat_matika':
+        return <ChatMatikaView theme={themeColors} profile={state.profile} />;
+
+      case 'printPreview':
+        return (
+          <PrintPreviewView
+            type={state.printType!}
+            theme={themeColors}
+            profile={state.profile}
+            lastSession={state.lastTryOutResult || null}
+            ramadanTodos={[]}
+            printPayload={state.printPayload}
+            onBack={() => navigate(prevView)}
+          />
+        );
+
+      default:
+        return <HomeView navigate={navigate} theme={themeColors} profile={state.profile} />;
     }
   };
 
   // LICENSE GATE RENDERING
   if (isAuthorized === null) {
-    return <div className="min-h-screen bg-white" />; // Or a spinner
+    return <div className="min-h-screen bg-white" />;
   }
 
   if (isAuthorized === false) {
     return <LicenseGateView theme={themeColors} onActivated={() => setIsAuthorized(true)} />;
   }
 
+  // ✅ MOBILE FRIENDLY LAYOUT:
+  // - Sidebar hidden on mobile
+  // - Bottom nav shown on mobile
+  // - Safe bottom padding so content never covered
   return (
-    <div className={`min-h-screen flex ${themeColors.bg}`}>
-      <Sidebar currentView={state.view} navigate={navigate} theme={themeColors} />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header profile={state.profile} theme={themeColors} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-5xl mx-auto">
-            {renderView()}
-          </div>
-        </main>
+    <div className={`min-h-screen ${themeColors.bg}`}>
+      <div className="flex min-h-screen">
+        {/* Desktop/Tablet Sidebar */}
+        <div className="hidden md:block">
+          <Sidebar currentView={state.view} navigate={navigate} theme={themeColors} />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header profile={state.profile} theme={themeColors} />
+
+          <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-4 md:pt-6 pb-28 md:pb-8 min-w-0">
+            <div className="w-full max-w-5xl mx-auto">
+              {renderView()}
+            </div>
+          </main>
+        </div>
       </div>
 
+      {/* Mobile Bottom Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-white/95 backdrop-blur border-t border-gray-200">
+        <div className="grid grid-cols-5 gap-1 px-2 py-2 pb-[calc(env(safe-area-inset-bottom)+8px)]">
+          <button
+            onClick={() => navigate('home')}
+            className={`py-2 rounded-xl text-xs font-black ${state.view === 'home' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
+          >
+            Home
+          </button>
+          <button
+            onClick={() => navigate('material')}
+            className={`py-2 rounded-xl text-xs font-black ${state.view === 'material' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
+          >
+            Materi
+          </button>
+          <button
+            onClick={() => navigate('practice')}
+            className={`py-2 rounded-xl text-xs font-black ${state.view === 'practice' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
+          >
+            Latihan
+          </button>
+          <button
+            onClick={() => navigate('tryout')}
+            className={`py-2 rounded-xl text-xs font-black ${state.view === 'tryout' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
+          >
+            TryOut
+          </button>
+          <button
+            onClick={() => navigate('chat_matika')}
+            className={`py-2 rounded-xl text-xs font-black ${state.view === 'chat_matika' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
+          >
+            Chat
+          </button>
+        </div>
+      </div>
+
+      {/* Popup Level/Badge */}
       {unlockedPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full shadow-2xl text-center space-y-6 relative overflow-hidden">
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-2xl"></div>
-              <div className="relative z-10 space-y-4">
-                 <div className="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-3xl flex items-center justify-center mx-auto text-5xl shadow-lg">
-                    {unlockedPopup.type === 'level' ? '🌟' : '🏆'}
-                 </div>
-                 <h4 className="text-3xl font-black text-gray-800">{unlockedPopup.title}</h4>
-                 <p className="text-gray-500 font-medium">{unlockedPopup.desc}</p>
-                 <button 
-                   onClick={() => setUnlockedPopup(null)}
-                   className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-lg hover:bg-blue-700 transition-all active:scale-95"
-                 >
-                   Hore! Keren ✨
-                 </button>
+          <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full shadow-2xl text-center space-y-6 relative overflow-hidden">
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-2xl"></div>
+            <div className="relative z-10 space-y-4">
+              <div className="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-3xl flex items-center justify-center mx-auto text-5xl shadow-lg">
+                {unlockedPopup.type === 'level' ? '🌟' : '🏆'}
               </div>
-           </div>
+              <h4 className="text-3xl font-black text-gray-800">{unlockedPopup.title}</h4>
+              <p className="text-gray-500 font-medium">{unlockedPopup.desc}</p>
+              <button
+                onClick={() => setUnlockedPopup(null)}
+                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+              >
+                Hore! Keren ✨
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
