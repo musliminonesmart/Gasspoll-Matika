@@ -30,6 +30,8 @@ import PrintCenterView from './views/PrintCenterView';
 import ChatMatikaView from './views/ChatMatikaView';
 import PrintPreviewView from './views/PrintPreviewView';
 
+import { Home, BookOpen, PenTool, ClipboardList, MessageCircle } from 'lucide-react';
+
 // License
 import { loadLicense, isExpired } from './utils/license';
 import LicenseGateView from './views/LicenseGateView';
@@ -345,10 +347,26 @@ const App: React.FC = () => {
     return <LicenseGateView theme={themeColors} onActivated={() => setIsAuthorized(true)} />;
   }
 
+  const MobileNavItem = ({ id, icon: Icon, label }: { id: AppState['view'], icon: any, label: string }) => {
+     const isActive = state.view === id;
+     return (
+       <button
+         onClick={() => navigate(id)}
+         className={`relative flex flex-col items-center justify-center py-2 px-1 transition-all duration-300 ${isActive ? '-translate-y-4' : 'opacity-60'}`}
+       >
+         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-md ${isActive ? `${themeColors.primary} text-white scale-110 shadow-${themeColors.primary}/50 border-4 border-white` : 'bg-transparent text-gray-500'}`}>
+            <Icon size={isActive ? 24 : 22} />
+         </div>
+         <span className={`text-[10px] font-bold mt-1 transition-all ${isActive ? 'text-gray-800 scale-100' : 'text-gray-400 scale-0 h-0'}`}>
+           {label}
+         </span>
+       </button>
+     );
+  };
+
   // ✅ MOBILE FRIENDLY LAYOUT:
   // - Sidebar hidden on mobile
-  // - Bottom nav shown on mobile
-  // - Safe bottom padding so content never covered
+  // - Floating Bottom nav shown on mobile
   return (
     <div className={`min-h-screen ${themeColors.bg}`}>
       <div className="flex min-h-screen">
@@ -359,7 +377,12 @@ const App: React.FC = () => {
 
         {/* Content */}
         <div className="flex-1 flex flex-col min-w-0">
-          <Header profile={state.profile} theme={themeColors} />
+          <Header 
+            profile={state.profile} 
+            theme={themeColors} 
+            currentTheme={state.theme}
+            onUpdateTheme={updateTheme}
+          />
 
           <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-4 md:pt-6 pb-28 md:pb-8 min-w-0">
             <div className="w-full max-w-5xl mx-auto">
@@ -369,39 +392,24 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-white/95 backdrop-blur border-t border-gray-200">
-        <div className="grid grid-cols-5 gap-1 px-2 py-2 pb-[calc(env(safe-area-inset-bottom)+8px)]">
-          <button
-            onClick={() => navigate('home')}
-            className={`py-2 rounded-xl text-xs font-black ${state.view === 'home' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
-          >
-            Home
-          </button>
-          <button
-            onClick={() => navigate('material')}
-            className={`py-2 rounded-xl text-xs font-black ${state.view === 'material' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
-          >
-            Materi
-          </button>
-          <button
-            onClick={() => navigate('practice')}
-            className={`py-2 rounded-xl text-xs font-black ${state.view === 'practice' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
-          >
-            Latihan
-          </button>
-          <button
-            onClick={() => navigate('tryout')}
-            className={`py-2 rounded-xl text-xs font-black ${state.view === 'tryout' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
-          >
-            TryOut
-          </button>
-          <button
-            onClick={() => navigate('chat_matika')}
-            className={`py-2 rounded-xl text-xs font-black ${state.view === 'chat_matika' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
-          >
-            Chat
-          </button>
+      {/* Floating Mobile Bottom Nav (Kid Friendly) */}
+      <div className="md:hidden fixed bottom-6 inset-x-4 z-[90]">
+        <div className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl shadow-black/10 px-4 py-2 flex justify-between items-end">
+          <MobileNavItem id="home" icon={Home} label="Home" />
+          <MobileNavItem id="material" icon={BookOpen} label="Materi" />
+          <div className="w-8"></div> {/* Spacer for center button */}
+          <MobileNavItem id="tryout" icon={ClipboardList} label="TryOut" />
+          <MobileNavItem id="chat_matika" icon={MessageCircle} label="Chat" />
+          
+          {/* Main Action Button (Center) */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+             <button 
+               onClick={() => navigate('practice')}
+               className={`w-16 h-16 rounded-full ${themeColors.primary} text-white shadow-xl flex items-center justify-center border-4 border-white transform transition-transform hover:scale-105 active:scale-95`}
+             >
+                <PenTool size={28} />
+             </button>
+          </div>
         </div>
       </div>
 
