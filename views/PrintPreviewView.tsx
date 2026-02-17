@@ -26,6 +26,7 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
   }, [profile.grade]);
 
   // A4 size in pixels at 96 DPI approx
+  // 794px width is standard A4 width for screen rendering
   const A4_PX = { w: 794, h: 1123 };
 
   // Wait for fonts to load before exporting
@@ -46,51 +47,104 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
     try {
       await waitFontsReady();
 
-      // Find all print pages
+      // Find all print pages in the preview
       const pages = Array.from(printRef.current.querySelectorAll('.print-page'));
       if (pages.length === 0) return;
 
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const baseFilename = `GassPollMatika_${type}_${profile.name.replace(/\s+/g, '_')}_${dateStr}`;
 
+      // --- CRITICAL MOBILE FIX: SANDBOX TECHNIQUE ---
+      // We create an invisible container with FIXED Desktop A4 width.
+      // We clone the content there so html-to-image captures the "Desktop" layout,
+      // not the squashed Mobile layout.
+      
+      const isLandscape = type === 'sertifikat';
+      const targetWidth = isLandscape ? 1123 : 794;
+      const targetHeight = isLandscape ? 794 : 1123;
+
+      const sandbox = document.createElement('div');
+      sandbox.style.position = 'fixed';
+      sandbox.style.top = '-10000px';
+      sandbox.style.left = '-10000px';
+      sandbox.style.width = `${targetWidth}px`;
+      sandbox.style.height = 'auto';
+      sandbox.style.zIndex = '-1';
+      sandbox.style.background = '#ffffff';
+      document.body.appendChild(sandbox);
+
       const commonOpts = {
         cacheBust: true,
-        pixelRatio: 2, // High resolution
-        backgroundColor: '#ffffff'
+        pixelRatio: 2, // High resolution for crisp text
+        backgroundColor: '#ffffff',
+        width: targetWidth,
+        height: targetHeight,
+        style: {
+           transform: 'none', // Ensure no mobile scaling is applied
+           margin: '0',
+           padding: isLandscape ? '10mm' : '14mm 12mm 22mm 12mm' // Force padding consistency
+        }
       };
 
       if (format === 'pdf') {
         const pdf = new jsPDF({
-          orientation: type === 'sertifikat' ? 'landscape' : 'portrait',
+          orientation: isLandscape ? 'landscape' : 'portrait',
           unit: 'pt',
           format: 'a4',
         });
 
-        const pageW = pdf.internal.pageSize.getWidth();
-        const pageH = pdf.internal.pageSize.getHeight();
+        const pdfPageW = pdf.internal.pageSize.getWidth();
+        const pdfPageH = pdf.internal.pageSize.getHeight();
 
         for (let i = 0; i < pages.length; i++) {
-          const pageEl = pages[i] as HTMLElement;
-          const dataUrl = await toPng(pageEl, { ...commonOpts, width: pageEl.offsetWidth, height: pageEl.offsetHeight });
+          const originalPage = pages[i] as HTMLElement;
+          
+          // 1. Clone the node
+          const clonedNode = originalPage.cloneNode(true) as HTMLElement;
+          
+          // 2. Reset styles on the clone to ensure it fills the sandbox
+          clonedNode.style.transform = 'none';
+          clonedNode.style.margin = '0';
+          clonedNode.style.width = '100%';
+          clonedNode.style.height = '100%';
+          clonedNode.style.boxShadow = 'none';
+          clonedNode.style.borderRadius = '0';
+          
+          // 3. Append to sandbox
+          sandbox.innerHTML = '';
+          sandbox.appendChild(clonedNode);
+
+          // 4. Capture from sandbox
+          const dataUrl = await toPng(clonedNode, { 
+             ...commonOpts, 
+             width: targetWidth,
+             height: targetHeight 
+          });
           
           if (i > 0) pdf.addPage();
-          
-          // Adjust image to fit PDF page
-          pdf.addImage(dataUrl, 'PNG', 0, 0, pageW, pageH);
+          pdf.addImage(dataUrl, 'PNG', 0, 0, pdfPageW, pdfPageH);
         }
         pdf.save(`${baseFilename}.pdf`);
       } 
       else {
-        // For single image export, we only take the first page usually, or we could stitch them.
-        // For now, let's just export the first page for PNG/JPG
-        const pageEl = pages[0] as HTMLElement;
-        const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+        // For Image export, take the first page only (usually mostly single page)
+        const originalPage = pages[0] as HTMLElement;
+        const clonedNode = originalPage.cloneNode(true) as HTMLElement;
+        
+        clonedNode.style.transform = 'none';
+        clonedNode.style.margin = '0';
+        clonedNode.style.width = '100%';
+        clonedNode.style.height = '100%';
+        clonedNode.style.boxShadow = 'none';
+
+        sandbox.innerHTML = '';
+        sandbox.appendChild(clonedNode);
         
         let dataUrl;
         if (format === 'png') {
-           dataUrl = await toPng(pageEl, commonOpts);
+           dataUrl = await toPng(clonedNode, commonOpts);
         } else {
-           dataUrl = await toJpeg(pageEl, { ...commonOpts, quality: 0.95 });
+           dataUrl = await toJpeg(clonedNode, { ...commonOpts, quality: 0.95 });
         }
 
         const link = document.createElement('a');
@@ -98,6 +152,10 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
         link.download = `${baseFilename}.${format}`;
         link.click();
       }
+
+      // Cleanup
+      document.body.removeChild(sandbox);
+
     } catch (error) {
       console.error('Export failed:', error);
       alert('Maaf, ada kendala saat ekspor. Coba lagi ya!');
