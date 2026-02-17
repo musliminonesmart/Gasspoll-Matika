@@ -186,7 +186,7 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] md:h-[calc(100vh-140px)] max-w-3xl mx-auto -mt-2">
+    <div className="flex flex-col h-[calc(100vh-85px)] md:h-[calc(100vh-140px)] max-w-3xl mx-auto -mt-2">
       
       {/* 1. Minimalist Header */}
       <div className="flex justify-between items-center px-4 py-2 shrink-0">
@@ -246,51 +246,51 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
           )}
         </div>
 
-        {/* 3. Footer: Input Area (Raised for Mobile) */}
-        {/* Added pb-28 for mobile to clear floating nav, and background to separate from chat */}
-        <div className="shrink-0 p-4 pb-28 md:pb-4 relative z-20 bg-white/80 backdrop-blur-md border-t border-white/50 rounded-b-[2.5rem]">
+        {/* 3. Footer: Input Area (Raised for Mobile & Kid Friendly) */}
+        {/* pb-32 on mobile gives huge clearance for floating nav */}
+        <div className="shrink-0 p-4 pb-32 md:pb-6 relative z-20 bg-gradient-to-t from-white/90 to-white/70 backdrop-blur-md border-t border-white/50 rounded-b-[2.5rem]">
            
-           {/* Expandable Quick Actions (Horizontal) */}
+           {/* Expandable Quick Actions (Horizontal) - Floating above input */}
            {showQuickActions && (
-             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-2 flex gap-2 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-2 zoom-in-95">
-                <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors whitespace-nowrap border border-blue-100">
-                   <FileText size={18} /> <span className="text-xs font-black">Rumus</span>
+             <div className="absolute bottom-[calc(100%-10px)] left-4 right-4 mb-2 bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border-2 border-blue-50 p-3 flex gap-3 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-4 zoom-in-95">
+                <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-2 px-5 py-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors whitespace-nowrap border border-blue-100 active:scale-95">
+                   <FileText size={20} /> <span className="text-sm font-black">Rumus</span>
                 </button>
-                <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors whitespace-nowrap border border-green-100">
-                   <LayoutGrid size={18} /> <span className="text-xs font-black">Buat Soal</span>
+                <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-2 px-5 py-3 bg-green-50 text-green-600 rounded-2xl hover:bg-green-100 transition-colors whitespace-nowrap border border-green-100 active:scale-95">
+                   <LayoutGrid size={20} /> <span className="text-sm font-black">Buat Soal</span>
                 </button>
-                <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-2 px-4 py-3 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-colors whitespace-nowrap border border-purple-100">
-                   <ImageIcon size={18} /> <span className="text-xs font-black">Visual</span>
+                <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-2 px-5 py-3 bg-purple-50 text-purple-600 rounded-2xl hover:bg-purple-100 transition-colors whitespace-nowrap border border-purple-100 active:scale-95">
+                   <ImageIcon size={20} /> <span className="text-sm font-black">Visual</span>
                 </button>
              </div>
            )}
   
-           <div className="flex gap-2 items-end">
-              {/* Magic Toggle Button */}
+           <div className="flex gap-3 items-end">
+              {/* Magic Toggle Button - Larger Touch Target */}
               <button 
                 onClick={() => setShowQuickActions(!showQuickActions)}
-                className={`p-3.5 rounded-[1.2rem] shadow-sm transition-all active:scale-95 flex items-center justify-center border-2 ${showQuickActions ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-yellow-500 border-yellow-200 hover:border-yellow-400'}`}
+                className={`w-14 h-14 rounded-[1.2rem] shadow-md transition-all active:scale-90 flex items-center justify-center border-2 ${showQuickActions ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-yellow-500 border-yellow-200 hover:border-yellow-400'}`}
               >
-                {showQuickActions ? <X size={20} /> : <Wand2 size={20} className={!showQuickActions ? "animate-pulse" : ""} />}
+                {showQuickActions ? <X size={24} /> : <Wand2 size={24} className={!showQuickActions ? "animate-pulse" : ""} />}
               </button>
   
-              {/* Input Field */}
-              <div className="flex-1 bg-white rounded-[1.5rem] border-2 border-gray-200 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-50 transition-all shadow-sm flex items-center px-4 py-1.5">
+              {/* Input Field - Pill Shape & Larger Text */}
+              <div className="flex-1 bg-white rounded-full border-2 border-gray-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100 transition-all shadow-md flex items-center px-2 py-1.5 h-14">
                  <input 
                    type="text" 
                    value={inputText} 
                    onChange={(e) => setInputText(e.target.value)} 
                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
-                   placeholder={chatHistory.length <= 1 ? "Pilih topik di atas atau ketik..." : "Tanya Kak Matika..."}
+                   placeholder={chatHistory.length <= 1 ? "Pilih topik atau ketik..." : "Tanya Kak Matika..."}
                    disabled={loading} 
-                   className="flex-1 py-3 bg-transparent outline-none text-base font-bold text-gray-700 placeholder:text-gray-300" 
+                   className="flex-1 pl-4 bg-transparent outline-none text-base font-bold text-gray-800 placeholder:text-gray-400 placeholder:font-medium" 
                  />
                  <button 
                    onClick={() => handleSendMessage()} 
                    disabled={!inputText.trim() || loading} 
-                   className={`p-2.5 rounded-xl transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-md scale-100' : 'bg-gray-50 text-gray-300 scale-90'}`}
+                   className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-lg scale-100 hover:bg-blue-700' : 'bg-gray-100 text-gray-300 scale-90'}`}
                  >
-                   <Send size={20} />
+                   <Send size={20} className={inputText.trim() ? "translate-x-0.5" : ""} />
                  </button>
               </div>
            </div>
