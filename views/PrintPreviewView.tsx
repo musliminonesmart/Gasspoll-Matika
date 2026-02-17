@@ -25,18 +25,13 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
     return `GP-TKA-${year}-${profile.grade}-${rand}`;
   }, [profile.grade]);
 
-  // A4 size in pixels at 96 DPI approx
-  // 794px width is standard A4 width for screen rendering
-  const A4_PX = { w: 794, h: 1123 };
-
   // Wait for fonts to load before exporting
   async function waitFontsReady() {
-    // @ts-ignore
-    if (document.fonts && document.fonts.ready) {
-       // @ts-ignore
-       await document.fonts.ready;
-    } else {
-       await new Promise((r) => setTimeout(r, 500));
+    try {
+      // @ts-ignore
+      await document.fonts.ready;
+    } catch (e) {
+      await new Promise((r) => setTimeout(r, 1000));
     }
   }
 
@@ -54,35 +49,45 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const baseFilename = `GassPollMatika_${type}_${profile.name.replace(/\s+/g, '_')}_${dateStr}`;
 
-      // --- CRITICAL MOBILE FIX: SANDBOX TECHNIQUE ---
-      // We create an invisible container with FIXED Desktop A4 width.
-      // We clone the content there so html-to-image captures the "Desktop" layout,
-      // not the squashed Mobile layout.
-      
+      // --- ROBUST MOBILE FIX: ABSOLUTE SANDBOX ---
+      // 1. Determine dimensions (A4 @ 96 DPI)
       const isLandscape = type === 'sertifikat';
       const targetWidth = isLandscape ? 1123 : 794;
       const targetHeight = isLandscape ? 794 : 1123;
 
+      // 2. Create sandbox using ABSOLUTE positioning
+      // Fixed positioning clips content on mobile viewports. Absolute allows full render.
       const sandbox = document.createElement('div');
-      sandbox.style.position = 'fixed';
-      sandbox.style.top = '-10000px';
-      sandbox.style.left = '-10000px';
-      sandbox.style.width = `${targetWidth}px`;
-      sandbox.style.height = 'auto';
-      sandbox.style.zIndex = '-1';
-      sandbox.style.background = '#ffffff';
+      Object.assign(sandbox.style, {
+        position: 'absolute', 
+        top: '0',
+        left: '0',
+        width: `${targetWidth}px`,
+        minHeight: `${targetHeight}px`,
+        zIndex: '-9999', // Behind everything
+        background: '#ffffff', // Force white bg
+        display: 'block',
+        visibility: 'visible', // Must be visible
+        overflow: 'hidden' // Clip internal overflow
+      });
       document.body.appendChild(sandbox);
 
       const commonOpts = {
         cacheBust: true,
-        pixelRatio: 2, // High resolution for crisp text
+        pixelRatio: 2, // 2x for Retina-like sharpness
         backgroundColor: '#ffffff',
         width: targetWidth,
         height: targetHeight,
         style: {
-           transform: 'none', // Ensure no mobile scaling is applied
+           transform: 'none',
            margin: '0',
-           padding: isLandscape ? '10mm' : '14mm 12mm 22mm 12mm' // Force padding consistency
+           padding: '0', // Reset padding on sandbox, let the page component handle it
+           boxShadow: 'none',
+           borderRadius: '0',
+           background: '#ffffff', 
+           fontFeatureSettings: '"kern" 0',
+           textRendering: 'geometricPrecision',
+           visibility: 'visible'
         }
       };
 
@@ -99,23 +104,35 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
         for (let i = 0; i < pages.length; i++) {
           const originalPage = pages[i] as HTMLElement;
           
-          // 1. Clone the node
+          // Clone and Strip Styles
           const clonedNode = originalPage.cloneNode(true) as HTMLElement;
           
-          // 2. Reset styles on the clone to ensure it fills the sandbox
-          clonedNode.style.transform = 'none';
-          clonedNode.style.margin = '0';
-          clonedNode.style.width = '100%';
-          clonedNode.style.height = '100%';
-          clonedNode.style.boxShadow = 'none';
-          clonedNode.style.borderRadius = '0';
+          // Force Reset Styles on the Page Node
+          Object.assign(clonedNode.style, {
+            transform: 'none',
+            margin: '0',
+            width: '100%',
+            height: '100%',
+            minHeight: '100%',
+            boxShadow: 'none',
+            borderRadius: '0',
+            border: 'none',
+            filter: 'none',
+            backdropFilter: 'none',
+            backgroundColor: '#ffffff'
+          });
           
-          // 3. Append to sandbox
           sandbox.innerHTML = '';
           sandbox.appendChild(clonedNode);
 
-          // 4. Capture from sandbox
-          const dataUrl = await toPng(clonedNode, { 
+          // Force reflow
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const _ = sandbox.offsetHeight;
+          
+          // Delay for mobile paint
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          const dataUrl = await toPng(sandbox, { 
              ...commonOpts, 
              width: targetWidth,
              height: targetHeight 
@@ -127,24 +144,38 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
         pdf.save(`${baseFilename}.pdf`);
       } 
       else {
-        // For Image export, take the first page only (usually mostly single page)
+        // Image Export (Single Page)
         const originalPage = pages[0] as HTMLElement;
         const clonedNode = originalPage.cloneNode(true) as HTMLElement;
         
-        clonedNode.style.transform = 'none';
-        clonedNode.style.margin = '0';
-        clonedNode.style.width = '100%';
-        clonedNode.style.height = '100%';
-        clonedNode.style.boxShadow = 'none';
+        Object.assign(clonedNode.style, {
+            transform: 'none',
+            margin: '0',
+            width: '100%',
+            height: '100%',
+            minHeight: '100%',
+            boxShadow: 'none',
+            borderRadius: '0',
+            border: 'none',
+            filter: 'none',
+            backdropFilter: 'none',
+            backgroundColor: '#ffffff'
+        });
 
         sandbox.innerHTML = '';
         sandbox.appendChild(clonedNode);
         
+        // Force reflow
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _ = sandbox.offsetHeight;
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         let dataUrl;
         if (format === 'png') {
-           dataUrl = await toPng(clonedNode, commonOpts);
+           dataUrl = await toPng(sandbox, commonOpts);
         } else {
-           dataUrl = await toJpeg(clonedNode, { ...commonOpts, quality: 0.95 });
+           dataUrl = await toJpeg(sandbox, { ...commonOpts, quality: 0.95 });
         }
 
         const link = document.createElement('a');
@@ -158,7 +189,7 @@ const PrintPreviewView: React.FC<PrintPreviewViewProps> = ({ type, theme, profil
 
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Maaf, ada kendala saat ekspor. Coba lagi ya!');
+      alert('Maaf, ada kendala saat menyimpan. Silakan coba lagi.');
     } finally {
       setIsExporting(null);
     }
