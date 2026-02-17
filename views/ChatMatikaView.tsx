@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StudentProfile, ChatMessage, DiagramSpec } from '../types';
+import { StudentProfile, ChatMessage, DiagramSpec, AppState } from '../types';
 import { sendChatMatikaMessage } from '../services/geminiService';
-import { Send, Sparkles, User, Bot, Loader2, Image as ImageIcon, Printer, Download, Plus, X, RotateCcw, FileText, LayoutGrid, Wand2 } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, Image as ImageIcon, Printer, Download, Plus, X, RotateCcw, FileText, LayoutGrid, Wand2, ChevronLeft, Home } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 interface ChatMatikaViewProps {
   theme: any;
   profile: StudentProfile;
+  navigate?: (view: AppState['view']) => void;
 }
 
 const TOPICS = [
@@ -100,7 +101,7 @@ const DiagramRenderer: React.FC<{ spec: DiagramSpec, theme: any }> = ({ spec, th
   );
 };
 
-const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
+const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile, navigate }) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -186,31 +187,51 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-85px)] md:h-[calc(100vh-140px)] max-w-3xl mx-auto -mt-2">
+    // FULL HEIGHT CONTAINER
+    <div className="flex flex-col h-[100dvh] bg-gray-50 md:bg-white md:rounded-[2.5rem] md:h-[calc(100vh-100px)] md:border-2 md:overflow-hidden relative">
       
-      {/* 1. Minimalist Header */}
-      <div className="flex justify-between items-center px-4 py-2 shrink-0">
-         <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-            <span className="text-xs font-black uppercase text-gray-400 tracking-widest">
-              {selectedTopic ? `Topik: ${selectedTopic}` : 'Chat Matika'}
-            </span>
+      {/* 1. SLIM INTERNAL HEADER (Replacements Global Header) */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 shrink-0 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+         <div className="flex items-center gap-2">
+            {navigate && (
+              <button 
+                onClick={() => navigate('home')}
+                className="p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+            )}
+            <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-full ${theme.primary} flex items-center justify-center text-white`}>
+                   <Bot size={18} />
+                </div>
+                <div>
+                   <h3 className="text-sm font-black text-gray-800 leading-tight">Kak Matika</h3>
+                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                     {selectedTopic ? selectedTopic : 'Konsultan Pintar'}
+                   </p>
+                </div>
+            </div>
          </div>
-         {chatHistory.length > 2 && (
-           <button onClick={resetChat} className="text-[10px] font-bold text-gray-400 bg-gray-100 hover:bg-red-50 hover:text-red-500 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1">
-             <RotateCcw size={12} /> Reset
-           </button>
-         )}
+         
+         <div className="flex gap-2">
+           {chatHistory.length > 2 && (
+             <button onClick={resetChat} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+               <RotateCcw size={18} />
+             </button>
+           )}
+         </div>
       </div>
 
-      {/* 2. Chat Area */}
-      <div className="flex-1 relative overflow-hidden flex flex-col bg-white/40 rounded-t-[2.5rem] md:rounded-[2.5rem] border-x border-t border-white/50 shadow-sm backdrop-blur-sm">
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-4">
+      {/* 2. Chat Area (Expanded) */}
+      <div className="flex-1 relative overflow-hidden flex flex-col bg-gray-50/50">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-24">
           {chatHistory.map((msg, i) => (
             <div key={i} className={`space-y-2 animate-in slide-in-from-bottom-2 duration-300`}>
               <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex gap-3 max-w-[92%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 shadow-sm self-end mb-1 ${msg.role === 'user' ? 'bg-gray-800 text-white border-gray-700' : `${theme.primary} text-white border-white/20`}`}>
-                       {msg.role === 'user' ? <User size={14} /> : <Bot size={16} />}
+                  <div className={`flex gap-2 max-w-[92%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border mt-auto mb-1 ${msg.role === 'user' ? 'bg-gray-800 text-white border-gray-700' : `${theme.primary} text-white border-white/20`}`}>
+                       {msg.role === 'user' ? <User size={12} /> : <Bot size={12} />}
                     </div>
                     {renderBubbleContent(msg)}
                   </div>
@@ -218,12 +239,12 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
 
               {/* Show Topic Grid ONLY after the FIRST welcome message */}
               {i === 0 && chatHistory.length === 1 && (
-                 <div className="pl-12 pr-4 grid grid-cols-2 md:grid-cols-4 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                 <div className="pl-10 pr-2 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                     {TOPICS.map((t) => (
                       <button
                         key={t.id}
                         onClick={() => selectTopic(t.id)}
-                        className={`p-3 rounded-2xl border-2 text-left transition-all hover:scale-105 active:scale-95 flex items-center justify-between group ${t.color} hover:shadow-sm bg-white`}
+                        className={`p-3 rounded-2xl border text-left transition-all hover:scale-105 active:scale-95 flex items-center justify-between group ${t.color} hover:shadow-sm bg-white shadow-sm`}
                       >
                         <span className="font-bold text-xs">{t.id}</span>
                         <div className="w-5 h-5 rounded-full bg-white/50 flex items-center justify-center">
@@ -237,64 +258,64 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
           ))}
           
           {loading && (
-            <div className="flex justify-start pl-11">
-              <div className="px-4 py-3 bg-gray-50/80 rounded-3xl rounded-tl-sm flex items-center gap-2 border border-gray-100">
-                 <Loader2 className="animate-spin text-gray-400" size={16} />
-                 <span className="text-xs font-bold text-gray-400 animate-pulse">Mengetik...</span>
+            <div className="flex justify-start pl-8">
+              <div className="px-4 py-2 bg-gray-100 rounded-2xl rounded-tl-sm flex items-center gap-2">
+                 <Loader2 className="animate-spin text-gray-400" size={14} />
+                 <span className="text-xs font-bold text-gray-500 animate-pulse">Sedang berpikir...</span>
               </div>
             </div>
           )}
         </div>
+      </div>
 
-        {/* 3. Footer: Input Area (Raised for Mobile & Kid Friendly) */}
-        {/* pb-32 on mobile gives huge clearance for floating nav */}
-        <div className="shrink-0 p-4 pb-32 md:pb-6 relative z-20 bg-gradient-to-t from-white/90 to-white/70 backdrop-blur-md border-t border-white/50 rounded-b-[2.5rem]">
-           
-           {/* Expandable Quick Actions (Horizontal) - Floating above input */}
-           {showQuickActions && (
-             <div className="absolute bottom-[calc(100%-10px)] left-4 right-4 mb-2 bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border-2 border-blue-50 p-3 flex gap-3 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-4 zoom-in-95">
-                <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-2 px-5 py-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition-colors whitespace-nowrap border border-blue-100 active:scale-95">
-                   <FileText size={20} /> <span className="text-sm font-black">Rumus</span>
-                </button>
-                <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-2 px-5 py-3 bg-green-50 text-green-600 rounded-2xl hover:bg-green-100 transition-colors whitespace-nowrap border border-green-100 active:scale-95">
-                   <LayoutGrid size={20} /> <span className="text-sm font-black">Buat Soal</span>
-                </button>
-                <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-2 px-5 py-3 bg-purple-50 text-purple-600 rounded-2xl hover:bg-purple-100 transition-colors whitespace-nowrap border border-purple-100 active:scale-95">
-                   <ImageIcon size={20} /> <span className="text-sm font-black">Visual</span>
-                </button>
-             </div>
-           )}
-  
-           <div className="flex gap-3 items-end">
-              {/* Magic Toggle Button - Larger Touch Target */}
-              <button 
-                onClick={() => setShowQuickActions(!showQuickActions)}
-                className={`w-14 h-14 rounded-[1.2rem] shadow-md transition-all active:scale-90 flex items-center justify-center border-2 ${showQuickActions ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-yellow-500 border-yellow-200 hover:border-yellow-400'}`}
-              >
-                {showQuickActions ? <X size={24} /> : <Wand2 size={24} className={!showQuickActions ? "animate-pulse" : ""} />}
+      {/* 3. Footer: Docked Input Area (Compact & Clean) */}
+      <div className="shrink-0 bg-white border-t border-gray-200 px-4 py-3 safe-area-bottom z-40 shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+         {/* Quick Actions (Pop-up) */}
+         {showQuickActions && (
+           <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 flex gap-3 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-4 zoom-in-95">
+              <button onClick={() => handleQuickAction('formula')} className="flex flex-col items-center gap-1 min-w-[70px] p-2 hover:bg-blue-50 rounded-xl transition-colors">
+                 <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center"><FileText size={18} /></div>
+                 <span className="text-[10px] font-black text-gray-600">Rumus</span>
               </button>
-  
-              {/* Input Field - Pill Shape & Larger Text */}
-              <div className="flex-1 bg-white rounded-full border-2 border-gray-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100 transition-all shadow-md flex items-center px-2 py-1.5 h-14">
-                 <input 
-                   type="text" 
-                   value={inputText} 
-                   onChange={(e) => setInputText(e.target.value)} 
-                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
-                   placeholder={chatHistory.length <= 1 ? "Pilih topik atau ketik..." : "Tanya Kak Matika..."}
-                   disabled={loading} 
-                   className="flex-1 pl-4 bg-transparent outline-none text-base font-bold text-gray-800 placeholder:text-gray-400 placeholder:font-medium" 
-                 />
+              <button onClick={() => handleQuickAction('mcq')} className="flex flex-col items-center gap-1 min-w-[70px] p-2 hover:bg-green-50 rounded-xl transition-colors">
+                 <div className="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center"><LayoutGrid size={18} /></div>
+                 <span className="text-[10px] font-black text-gray-600">Soal</span>
+              </button>
+              <button onClick={() => handleQuickAction('visual')} className="flex flex-col items-center gap-1 min-w-[70px] p-2 hover:bg-purple-50 rounded-xl transition-colors">
+                 <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center"><ImageIcon size={18} /></div>
+                 <span className="text-[10px] font-black text-gray-600">Visual</span>
+              </button>
+           </div>
+         )}
+
+         <div className="flex gap-2 items-end max-w-3xl mx-auto">
+            <button 
+              onClick={() => setShowQuickActions(!showQuickActions)}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showQuickActions ? 'bg-gray-800 text-white rotate-45' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+            >
+              {showQuickActions ? <Plus size={20} /> : <Wand2 size={20} />}
+            </button>
+
+            <div className="flex-1 bg-gray-100 rounded-[1.5rem] focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-200 border border-transparent transition-all flex items-center px-2">
+               <input 
+                 type="text" 
+                 value={inputText} 
+                 onChange={(e) => setInputText(e.target.value)} 
+                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
+                 placeholder="Ketik pertanyaan..."
+                 disabled={loading} 
+                 className="flex-1 pl-3 py-3 bg-transparent outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400" 
+               />
+               {inputText.trim() && (
                  <button 
                    onClick={() => handleSendMessage()} 
-                   disabled={!inputText.trim() || loading} 
-                   className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-lg scale-100 hover:bg-blue-700' : 'bg-gray-100 text-gray-300 scale-90'}`}
+                   className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
                  >
-                   <Send size={20} className={inputText.trim() ? "translate-x-0.5" : ""} />
+                   <Send size={14} className="ml-0.5" />
                  </button>
-              </div>
-           </div>
-        </div>
+               )}
+            </div>
+         </div>
       </div>
     </div>
   );

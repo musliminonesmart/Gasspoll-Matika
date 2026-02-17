@@ -70,6 +70,7 @@ const App: React.FC = () => {
   const [session, setSession] = useState<PracticeSession | null>(null);
 
   const themeColors = THEME_COLORS[state.theme];
+  const isChatView = state.view === 'chat_matika';
 
   // License Check on Mount
   useEffect(() => {
@@ -318,7 +319,8 @@ const App: React.FC = () => {
         );
 
       case 'chat_matika':
-        return <ChatMatikaView theme={themeColors} profile={state.profile} />;
+        // Now passing navigate prop so we can have a back button in the chat header
+        return <ChatMatikaView theme={themeColors} profile={state.profile} navigate={navigate} />;
 
       case 'printPreview':
         return (
@@ -364,9 +366,6 @@ const App: React.FC = () => {
      );
   };
 
-  // ✅ MOBILE FRIENDLY LAYOUT:
-  // - Sidebar hidden on mobile
-  // - Floating Bottom nav shown on mobile
   return (
     <div className={`min-h-screen ${themeColors.bg}`}>
       <div className="flex min-h-screen">
@@ -377,41 +376,47 @@ const App: React.FC = () => {
 
         {/* Content */}
         <div className="flex-1 flex flex-col min-w-0">
-          <Header 
-            profile={state.profile} 
-            theme={themeColors} 
-            currentTheme={state.theme}
-            onUpdateTheme={updateTheme}
-          />
+          {/* Hide Header on Chat View to maximize space */}
+          {!isChatView && (
+            <Header 
+              profile={state.profile} 
+              theme={themeColors} 
+              currentTheme={state.theme}
+              onUpdateTheme={updateTheme}
+            />
+          )}
 
-          <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-4 md:pt-6 pb-28 md:pb-8 min-w-0">
-            <div className="w-full max-w-5xl mx-auto">
+          {/* Adjust padding: Remove bottom/top padding for Chat view to allow full-screen effect */}
+          <main className={`flex-1 overflow-y-auto min-w-0 ${isChatView ? 'p-0 h-screen' : 'px-4 md:px-8 pt-4 md:pt-6 pb-28 md:pb-8'}`}>
+            <div className={`w-full ${isChatView ? 'h-full' : 'max-w-5xl mx-auto'}`}>
               {renderView()}
             </div>
           </main>
         </div>
       </div>
 
-      {/* Floating Mobile Bottom Nav (Kid Friendly) */}
-      <div className="md:hidden fixed bottom-6 inset-x-4 z-[90]">
-        <div className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl shadow-black/10 px-4 py-2 flex justify-between items-end">
-          <MobileNavItem id="home" icon={Home} label="Home" />
-          <MobileNavItem id="material" icon={BookOpen} label="Materi" />
-          <div className="w-8"></div> {/* Spacer for center button */}
-          <MobileNavItem id="tryout" icon={ClipboardList} label="TryOut" />
-          <MobileNavItem id="chat_matika" icon={MessageCircle} label="Chat" />
-          
-          {/* Main Action Button (Center) */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-6">
-             <button 
-               onClick={() => navigate('practice')}
-               className={`w-16 h-16 rounded-full ${themeColors.primary} text-white shadow-xl flex items-center justify-center border-4 border-white transform transition-transform hover:scale-105 active:scale-95`}
-             >
-                <PenTool size={28} />
-             </button>
+      {/* Floating Mobile Bottom Nav (Kid Friendly) - HIDDEN ON CHAT VIEW */}
+      {!isChatView && (
+        <div className="md:hidden fixed bottom-6 inset-x-4 z-[90]">
+          <div className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl shadow-black/10 px-4 py-2 flex justify-between items-end">
+            <MobileNavItem id="home" icon={Home} label="Home" />
+            <MobileNavItem id="material" icon={BookOpen} label="Materi" />
+            <div className="w-8"></div> {/* Spacer for center button */}
+            <MobileNavItem id="tryout" icon={ClipboardList} label="TryOut" />
+            <MobileNavItem id="chat_matika" icon={MessageCircle} label="Chat" />
+            
+            {/* Main Action Button (Center) */}
+            <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+               <button 
+                 onClick={() => navigate('practice')}
+                 className={`w-16 h-16 rounded-full ${themeColors.primary} text-white shadow-xl flex items-center justify-center border-4 border-white transform transition-transform hover:scale-105 active:scale-95`}
+               >
+                  <PenTool size={28} />
+               </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Popup Level/Badge */}
       {unlockedPopup && (
