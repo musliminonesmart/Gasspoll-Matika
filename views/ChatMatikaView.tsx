@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StudentProfile, ChatMessage, DiagramSpec } from '../types';
 import { sendChatMatikaMessage } from '../services/geminiService';
-import { Send, Sparkles, Book, FileText, LayoutGrid, User, Bot, Loader2, MessageSquare, Image as ImageIcon, Printer, Download, FileJson } from 'lucide-react';
-// Correct local imports for bundling
+import { Send, Sparkles, Book, FileText, LayoutGrid, User, Bot, Loader2, MessageSquare, Image as ImageIcon, Printer, Download, Wand2, X, RotateCcw, ChevronRight } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -12,8 +11,14 @@ interface ChatMatikaViewProps {
 }
 
 const TOPICS = [
-  'Operasi', 'Pecahan', 'FPB/KPK', 'SJT', 
-  'Bangun Datar', 'Bangun Ruang', 'Statistika', 'Logika & Pola'
+  { id: 'Operasi', color: 'bg-orange-100 text-orange-600 border-orange-200' },
+  { id: 'Pecahan', color: 'bg-blue-100 text-blue-600 border-blue-200' },
+  { id: 'FPB/KPK', color: 'bg-green-100 text-green-600 border-green-200' },
+  { id: 'SJT', color: 'bg-purple-100 text-purple-600 border-purple-200' },
+  { id: 'Bangun Datar', color: 'bg-pink-100 text-pink-600 border-pink-200' },
+  { id: 'Bangun Ruang', color: 'bg-teal-100 text-teal-600 border-teal-200' },
+  { id: 'Statistika', color: 'bg-yellow-100 text-yellow-600 border-yellow-200' },
+  { id: 'Logika', color: 'bg-indigo-100 text-indigo-600 border-indigo-200' }
 ];
 
 const renderMessageText = (text: string) => {
@@ -87,28 +92,28 @@ const DiagramRenderer: React.FC<{ spec: DiagramSpec, theme: any }> = ({ spec, th
   };
 
   return (
-    <div className="flex flex-col gap-3 max-w-full">
+    <div className="flex flex-col gap-3 max-w-full my-2">
       <div 
         ref={diagramRef}
-        className="bg-white rounded-[2rem] border-2 border-gray-100 overflow-hidden shadow-md w-full max-w-[480px]"
+        className="bg-white rounded-[2rem] border-2 border-gray-100 overflow-hidden shadow-lg w-full max-w-[400px] mx-auto"
       >
-        <div className="p-4 border-b bg-gray-50/50 flex justify-between items-center">
+        <div className="p-3 border-b bg-gray-50/50 flex justify-between items-center">
           <div>
-            <h4 className="font-black text-gray-800 text-sm leading-tight">{spec.title}</h4>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{spec.topic}</p>
+            <h4 className="font-black text-gray-800 text-xs leading-tight">{spec.title}</h4>
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{spec.topic}</p>
           </div>
           <div className="flex gap-1 no-print">
-            <button onClick={() => handleExport('png')} disabled={!!exporting} className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-green-500 transition-colors">
-              {exporting === 'png' ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            <button onClick={() => handleExport('png')} disabled={!!exporting} className="p-1.5 hover:bg-white rounded-lg text-gray-400 hover:text-green-500 transition-colors">
+              {exporting === 'png' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
             </button>
-            <button onClick={handlePrintDiagram} className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-blue-500 transition-colors">
-              <Printer size={16} />
+            <button onClick={handlePrintDiagram} className="p-1.5 hover:bg-white rounded-lg text-gray-400 hover:text-blue-500 transition-colors">
+              <Printer size={14} />
             </button>
           </div>
         </div>
-        <div className="p-6 flex justify-center bg-white aspect-[900/520] relative" dangerouslySetInnerHTML={{ __html: spec.svg.replace('<svg', '<svg style="width:100%; height:auto;"') }} />
+        <div className="p-4 flex justify-center bg-white aspect-[900/520] relative" dangerouslySetInnerHTML={{ __html: spec.svg.replace('<svg', '<svg style="width:100%; height:auto;"') }} />
       </div>
-      <div className="p-4 bg-blue-50/80 backdrop-blur-sm border-2 border-blue-100/50 rounded-2xl italic text-xs text-blue-900 leading-relaxed shadow-sm max-w-[480px]">
+      <div className="p-3 bg-blue-50/80 backdrop-blur-sm border border-blue-100 rounded-2xl italic text-xs text-blue-900 leading-relaxed shadow-sm w-full max-w-[400px] mx-auto">
         {renderMessageText(spec.caption)}
       </div>
     </div>
@@ -120,119 +125,233 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
   const [inputText, setInputText] = useState('');
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showMagicMenu, setShowMagicMenu] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Initial Greeting
   useEffect(() => {
     if (chatHistory.length === 0) {
       setChatHistory([{
         role: 'assistant',
-        text: `Halo ${profile.name || 'Sobat Matika'}! Aku Kak Chat Matika 😊\nKamu mau belajar topik apa hari ini? Kamu bisa pilih chip di atas atau langsung tanya ya.`,
+        text: `Halo ${profile.name || 'Sobat'}! Aku Kak Chat Matika.`,
         timestamp: Date.now()
       }]);
     }
   }, [profile.name]);
 
+  // Auto Scroll
   useEffect(() => {
-    if (scrollRef.current) { scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }); }
+    if (scrollRef.current) { 
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }); 
+    }
   }, [chatHistory, loading]);
 
   const handleSendMessage = async (customText?: string) => {
     const text = customText || inputText;
     if (!text.trim() || loading) return;
+
+    // Hide magic menu if open
+    setShowMagicMenu(false);
+
     const userMsg: ChatMessage = { role: 'user', text: text.trim(), timestamp: Date.now() };
     setChatHistory(prev => [...prev, userMsg]);
     setInputText('');
     setLoading(true);
+    
     try {
       const response = await sendChatMatikaMessage(chatHistory, text.trim(), profile.grade, selectedTopic);
       const assistantMsg: ChatMessage = { role: 'assistant', text: response, timestamp: Date.now() };
       setChatHistory(prev => [...prev, assistantMsg]);
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+    } catch (err) { 
+      console.error(err); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const selectTopic = (topic: string) => {
     setSelectedTopic(topic);
-    setChatHistory(prev => [...prev, { role: 'system', text: `Topik dipilih: ${topic}`, timestamp: Date.now() }]);
+    // Send a system-like message visually, but actual prompt to AI
+    const startMsg = `Aku mau belajar tentang ${topic} dong, Kak.`;
+    handleSendMessage(startMsg);
   };
 
-  const requestQuickFormula = () => {
-    if (!selectedTopic) { setChatHistory(prev => [...prev, { role: 'assistant', text: "Pilih topik dulu ya 😊", timestamp: Date.now() }]); return; }
-    handleSendMessage(`Berikan rumus cepat dan contoh singkat untuk topik ${selectedTopic} kelas ${profile.grade}`);
+  const handleQuickAction = (action: 'formula' | 'mcq' | 'visual') => {
+    if (!selectedTopic) {
+       // If no topic selected yet, ask user to pick one or just describe general
+       if (action === 'formula') handleSendMessage(`Berikan rumus matematika penting untuk kelas ${profile.grade}`);
+       if (action === 'mcq') handleSendMessage(`Buatkan soal latihan matematika umum untuk kelas ${profile.grade}`);
+       if (action === 'visual') handleSendMessage(`Buatkan gambar diagram matematika menarik untuk kelas ${profile.grade}`);
+    } else {
+       if (action === 'formula') handleSendMessage(`Berikan rumus cepat dan contoh untuk ${selectedTopic} kelas ${profile.grade}`);
+       if (action === 'mcq') handleSendMessage(`Buat soal PG tentang ${selectedTopic} kelas ${profile.grade} dengan kunci jawaban`);
+       if (action === 'visual') handleSendMessage(`Gambarkan diagram visual untuk menjelaskan ${selectedTopic}`);
+    }
+    setShowMagicMenu(false);
   };
 
-  const requestMCQs = () => {
-    if (!selectedTopic) { setChatHistory(prev => [...prev, { role: 'assistant', text: "Pilih topik dulu ya 😊", timestamp: Date.now() }]); return; }
-    handleSendMessage(`Buat 5 soal pilihan ganda A–D untuk topik ${selectedTopic} kelas ${profile.grade} lengkap dengan kunci dan pembahasannya.`);
-  };
-
-  const requestVisual = () => {
-    if (!selectedTopic) { setChatHistory(prev => [...prev, { role: 'assistant', text: "Pilih topik dulu ya 😊", timestamp: Date.now() }]); return; }
-    handleSendMessage(`Kak, buatkan gambar atau diagram visual untuk materi ${selectedTopic} kelas ${profile.grade}.`);
+  const resetChat = () => {
+    setChatHistory([{
+      role: 'assistant',
+      text: `Halo lagi ${profile.name}! Mau bahas topik apa sekarang?`,
+      timestamp: Date.now()
+    }]);
+    setSelectedTopic(null);
   };
 
   const renderBubbleContent = (msg: ChatMessage) => {
     if (msg.role === 'assistant' && msg.text.trim().startsWith('{') && msg.text.trim().endsWith('}')) {
-      try { const spec = JSON.parse(msg.text.trim()); if (spec.type === 'diagram_spec') return <DiagramRenderer spec={spec as DiagramSpec} theme={theme} />; } catch (e) {}
+      try { 
+        const spec = JSON.parse(msg.text.trim()); 
+        if (spec.type === 'diagram_spec') return <DiagramRenderer spec={spec as DiagramSpec} theme={theme} />; 
+      } catch (e) {}
     }
     return (
-      <div className={`p-4 rounded-[1.8rem] shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border-2 border-white/80 rounded-tl-none shadow-sm'}`}>
+      <div className={`px-5 py-3.5 rounded-3xl shadow-sm text-[15px] leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? `${theme.button} text-white rounded-tr-md` : 'bg-white text-gray-800 border-2 border-white/60 rounded-tl-md'}`}>
         {renderMessageText(msg.text)}
       </div>
     );
   };
 
+  const isChatStarted = chatHistory.length > 1;
+
   return (
-    <div className="flex flex-col h-[calc(100vh-160px)] max-w-4xl mx-auto space-y-4">
-      <div className="text-center space-y-1 py-2 no-print">
-         <h2 className={`text-3xl font-black ${theme.text} flex items-center justify-center gap-2`}>
-           <MessageSquare className="text-blue-500 fill-blue-50" size={32} /> Chat Matika
-         </h2>
-         <p className="text-gray-500 text-sm">Tanya apa saja tentang TKA & Matematika SD 😊</p>
+    <div className="flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-160px)] max-w-3xl mx-auto">
+      
+      {/* 1. Header Ringkas */}
+      <div className="flex justify-between items-center py-2 px-1 mb-2 shrink-0">
+         <div className="flex items-center gap-2">
+            <div className={`p-2 rounded-xl ${theme.primary} text-white shadow-sm`}>
+              <Bot size={20} />
+            </div>
+            <div>
+               <h2 className={`text-lg font-black ${theme.text} leading-none`}>Chat Matika</h2>
+               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                 {selectedTopic ? `Topik: ${selectedTopic}` : 'Pilih Topik Belajar'}
+               </p>
+            </div>
+         </div>
+         {isChatStarted && (
+           <button 
+             onClick={resetChat}
+             className="p-2 bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-500 rounded-full transition-all"
+             title="Mulai Ulang"
+           >
+             <RotateCcw size={18} />
+           </button>
+         )}
       </div>
-      <div className="flex flex-wrap justify-center gap-2 py-2 px-4 no-print overflow-x-auto no-scrollbar">
-        {TOPICS.map(topic => (
-          <button key={topic} onClick={() => selectTopic(topic)} className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all whitespace-nowrap ${selectedTopic === topic ? `${theme.primary} text-white border-transparent shadow-md scale-105` : 'bg-white border-gray-100 text-gray-500 hover:border-blue-200 hover:bg-blue-50/30'}`}>
-            {topic}
-          </button>
-        ))}
-      </div>
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-white/50 backdrop-blur-md rounded-[2.5rem] border-2 border-white shadow-inner scroll-smooth">
-        {chatHistory.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : msg.role === 'system' ? 'justify-center' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-            {msg.role === 'system' ? <span className="text-[10px] font-black uppercase text-gray-400 bg-gray-200/50 px-4 py-1 rounded-full border border-gray-100 tracking-widest">{msg.text}</span> : (
-              <div className={`flex gap-3 max-w-[90%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border-2 shadow-sm ${msg.role === 'user' ? 'bg-blue-500 text-white border-blue-400' : `${theme.primary} text-white border-white/20`}`}><User size={20} /></div>
-                {renderBubbleContent(msg)}
+
+      {/* 2. Chat Area (Expanded) */}
+      <div className="flex-1 relative overflow-hidden flex flex-col">
+        {/* Welcome Screen (Topics Grid) - Only show if chat hasn't started */}
+        {!isChatStarted ? (
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
+             <div className="text-center space-y-2 mb-8">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce shadow-lg shadow-blue-200">
+                   <MessageSquare size={32} className="text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-800">Mau belajar apa hari ini?</h3>
+                <p className="text-gray-500 text-sm max-w-xs mx-auto">Pilih topik di bawah ini biar Kak Chat Matika bisa bantu kamu lebih cepat!</p>
+             </div>
+             
+             <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+                {TOPICS.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => selectTopic(t.id)}
+                    className={`p-4 rounded-2xl border-2 text-left transition-all hover:scale-105 active:scale-95 flex items-center justify-between group ${t.color} hover:bg-white hover:shadow-md`}
+                  >
+                    <span className="font-bold text-sm">{t.id}</span>
+                    <ChevronRight size={16} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))}
+             </div>
+          </div>
+        ) : (
+          /* Actual Chat History */
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-20">
+            {chatHistory.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : msg.role === 'system' ? 'justify-center' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
+                {msg.role === 'system' ? (
+                  <span className="text-[9px] font-black uppercase text-gray-400 bg-gray-100 px-3 py-1 rounded-full tracking-widest">{msg.text}</span> 
+                ) : (
+                  <div className={`flex gap-3 max-w-[95%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 shadow-sm self-end mb-1 ${msg.role === 'user' ? 'bg-gray-800 text-white border-gray-700' : `${theme.primary} text-white border-white/20`}`}>
+                       {msg.role === 'user' ? <User size={14} /> : <Bot size={16} />}
+                    </div>
+                    {renderBubbleContent(msg)}
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {loading && (
+              <div className="flex justify-start animate-pulse pl-11">
+                <div className="px-5 py-3 bg-gray-100 rounded-3xl rounded-tl-none flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+                   <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                </div>
               </div>
             )}
           </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start animate-pulse">
-             <div className="flex gap-3 max-w-[85%]">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border-2 border-white/20 ${theme.primary} text-white shadow-sm`}><Bot size={20} /></div>
-                <div className="p-4 bg-white border-2 border-white/80 rounded-[1.8rem] rounded-tl-none shadow-sm flex items-center gap-3">
-                   <div className="flex gap-1">
-                      <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce delay-75"></div>
-                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce delay-150"></div>
-                   </div>
-                   <span className="text-xs font-bold text-gray-400 italic">Kak Chat Matika sedang mikir...</span>
-                </div>
-             </div>
-          </div>
         )}
       </div>
-      <div className="bg-white/80 backdrop-blur-md p-4 rounded-[2.5rem] border-2 border-white shadow-xl space-y-3 mx-2 md:mx-0 no-print">
-        <div className="flex flex-wrap gap-2 px-2">
-           <button onClick={requestQuickFormula} disabled={loading} className="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-[10px] font-black uppercase text-gray-400 hover:border-blue-200 hover:text-blue-500 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"><FileText size={14} /> Rumus Cepat</button>
-           <button onClick={requestMCQs} disabled={loading} className="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-[10px] font-black uppercase text-gray-400 hover:border-blue-200 hover:text-blue-500 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"><LayoutGrid size={14} /> Buat 5 Soal PG</button>
-           <button onClick={requestVisual} disabled={loading} className="px-4 py-2 bg-white border-2 border-gray-100 rounded-xl text-[10px] font-black uppercase text-gray-400 hover:border-blue-200 hover:text-blue-500 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"><ImageIcon size={14} /> Buatkan Visual</button>
-        </div>
-        <div className="flex gap-2">
-          <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} placeholder="Tulis pertanyaanmu…" disabled={loading} className="flex-1 px-6 py-4 bg-white border-2 border-gray-50 rounded-[1.5rem] outline-none focus:border-blue-300 transition-all text-sm shadow-inner disabled:opacity-50" />
-          <button onClick={() => handleSendMessage()} disabled={!inputText.trim() || loading} className={`p-4 rounded-[1.5rem] shadow-lg transition-all active:scale-90 disabled:opacity-50 ${theme.button}`}><Send size={24} /></button>
-        </div>
+
+      {/* 3. Footer: Magic Input Area */}
+      <div className="shrink-0 p-3 pt-0 relative z-20">
+         
+         {/* Magic Menu Popup */}
+         {showMagicMenu && (
+           <div className="absolute bottom-full left-4 mb-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 flex flex-col gap-1 min-w-[200px] animate-in slide-in-from-bottom-2 zoom-in-95">
+              <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-xl text-left transition-colors group">
+                 <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:scale-110 transition-transform"><FileText size={16} /></div>
+                 <div><p className="font-bold text-gray-800 text-xs">Rumus Cepat</p><p className="text-[10px] text-gray-400">Dapat ringkasan rumus</p></div>
+              </button>
+              <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-xl text-left transition-colors group">
+                 <div className="p-2 bg-green-100 text-green-600 rounded-lg group-hover:scale-110 transition-transform"><LayoutGrid size={16} /></div>
+                 <div><p className="font-bold text-gray-800 text-xs">Buat Soal PG</p><p className="text-[10px] text-gray-400">Latihan ujian</p></div>
+              </button>
+              <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-3 p-3 hover:bg-purple-50 rounded-xl text-left transition-colors group">
+                 <div className="p-2 bg-purple-100 text-purple-600 rounded-lg group-hover:scale-110 transition-transform"><ImageIcon size={16} /></div>
+                 <div><p className="font-bold text-gray-800 text-xs">Minta Gambar</p><p className="text-[10px] text-gray-400">Penjelasan visual</p></div>
+              </button>
+              <div className="border-t my-1"></div>
+              <button onClick={() => setShowMagicMenu(false)} className="text-center text-[10px] font-bold text-gray-400 py-1 hover:text-red-500">Tutup Menu</button>
+           </div>
+         )}
+
+         <div className="flex gap-2 items-end">
+            {/* Magic Button */}
+            <button 
+              onClick={() => setShowMagicMenu(!showMagicMenu)}
+              className={`p-3.5 rounded-[1.2rem] shadow-md transition-all active:scale-95 flex items-center justify-center border-2 ${showMagicMenu ? 'bg-yellow-400 text-white border-yellow-500 rotate-12' : 'bg-white text-yellow-500 border-yellow-100 hover:border-yellow-300'}`}
+              title="Menu Ajaib"
+            >
+              {showMagicMenu ? <X size={24} /> : <Wand2 size={24} />}
+            </button>
+
+            {/* Input Field */}
+            <div className="flex-1 bg-white rounded-[1.5rem] border-2 border-gray-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all shadow-sm flex items-center px-4 py-1">
+               <input 
+                 type="text" 
+                 value={inputText} 
+                 onChange={(e) => setInputText(e.target.value)} 
+                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
+                 placeholder={isChatStarted ? "Ketik pertanyaanmu..." : "Pilih topik di atas..."}
+                 disabled={loading} 
+                 className="flex-1 py-3 bg-transparent outline-none text-sm font-medium text-gray-700 placeholder:text-gray-400" 
+               />
+               <button 
+                 onClick={() => handleSendMessage()} 
+                 disabled={!inputText.trim() || loading} 
+                 className={`p-2 rounded-xl transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-md scale-100' : 'bg-gray-100 text-gray-300 scale-90'}`}
+               >
+                 <Send size={18} />
+               </button>
+            </div>
+         </div>
       </div>
     </div>
   );
