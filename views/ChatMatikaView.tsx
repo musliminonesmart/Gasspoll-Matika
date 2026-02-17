@@ -186,9 +186,9 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] max-w-3xl mx-auto -mt-2">
+    <div className="flex flex-col h-[calc(100vh-100px)] md:h-[calc(100vh-140px)] max-w-3xl mx-auto -mt-2">
       
-      {/* 1. Minimalist Header (Integrated actions) */}
+      {/* 1. Minimalist Header */}
       <div className="flex justify-between items-center px-4 py-2 shrink-0">
          <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
             <span className="text-xs font-black uppercase text-gray-400 tracking-widest">
@@ -202,8 +202,8 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
          )}
       </div>
 
-      {/* 2. Chat Area (Maximized) */}
-      <div className="flex-1 relative overflow-hidden flex flex-col bg-white/40 rounded-[2.5rem] border border-white/50 shadow-sm backdrop-blur-sm">
+      {/* 2. Chat Area */}
+      <div className="flex-1 relative overflow-hidden flex flex-col bg-white/40 rounded-t-[2.5rem] md:rounded-[2.5rem] border-x border-t border-white/50 shadow-sm backdrop-blur-sm">
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-4">
           {chatHistory.map((msg, i) => (
             <div key={i} className={`space-y-2 animate-in slide-in-from-bottom-2 duration-300`}>
@@ -246,20 +246,21 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
           )}
         </div>
 
-        {/* 3. Footer: Compact Input Area */}
-        <div className="shrink-0 p-3 pt-0 relative z-20">
+        {/* 3. Footer: Input Area (Raised for Mobile) */}
+        {/* Added pb-28 for mobile to clear floating nav, and background to separate from chat */}
+        <div className="shrink-0 p-4 pb-28 md:pb-4 relative z-20 bg-white/80 backdrop-blur-md border-t border-white/50 rounded-b-[2.5rem]">
            
            {/* Expandable Quick Actions (Horizontal) */}
            {showQuickActions && (
-             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-2 flex gap-2 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-2 zoom-in-95">
-                <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors whitespace-nowrap border border-blue-100">
-                   <FileText size={16} /> <span className="text-xs font-black">Rumus</span>
+             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 p-2 flex gap-2 overflow-x-auto scrollbar-hide animate-in slide-in-from-bottom-2 zoom-in-95">
+                <button onClick={() => handleQuickAction('formula')} className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors whitespace-nowrap border border-blue-100">
+                   <FileText size={18} /> <span className="text-xs font-black">Rumus</span>
                 </button>
-                <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors whitespace-nowrap border border-green-100">
-                   <LayoutGrid size={16} /> <span className="text-xs font-black">Buat Soal</span>
+                <button onClick={() => handleQuickAction('mcq')} className="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors whitespace-nowrap border border-green-100">
+                   <LayoutGrid size={18} /> <span className="text-xs font-black">Buat Soal</span>
                 </button>
-                <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-colors whitespace-nowrap border border-purple-100">
-                   <ImageIcon size={16} /> <span className="text-xs font-black">Visual</span>
+                <button onClick={() => handleQuickAction('visual')} className="flex items-center gap-2 px-4 py-3 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-colors whitespace-nowrap border border-purple-100">
+                   <ImageIcon size={18} /> <span className="text-xs font-black">Visual</span>
                 </button>
              </div>
            )}
@@ -274,7 +275,7 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
               </button>
   
               {/* Input Field */}
-              <div className="flex-1 bg-white rounded-[1.5rem] border-2 border-gray-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all shadow-sm flex items-center px-4 py-1">
+              <div className="flex-1 bg-white rounded-[1.5rem] border-2 border-gray-200 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-50 transition-all shadow-sm flex items-center px-4 py-1.5">
                  <input 
                    type="text" 
                    value={inputText} 
@@ -282,14 +283,14 @@ const ChatMatikaView: React.FC<ChatMatikaViewProps> = ({ theme, profile }) => {
                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
                    placeholder={chatHistory.length <= 1 ? "Pilih topik di atas atau ketik..." : "Tanya Kak Matika..."}
                    disabled={loading} 
-                   className="flex-1 py-3 bg-transparent outline-none text-sm font-bold text-gray-700 placeholder:text-gray-300" 
+                   className="flex-1 py-3 bg-transparent outline-none text-base font-bold text-gray-700 placeholder:text-gray-300" 
                  />
                  <button 
                    onClick={() => handleSendMessage()} 
                    disabled={!inputText.trim() || loading} 
-                   className={`p-2 rounded-xl transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-md scale-100' : 'bg-gray-50 text-gray-300 scale-90'}`}
+                   className={`p-2.5 rounded-xl transition-all ${inputText.trim() ? 'bg-blue-600 text-white shadow-md scale-100' : 'bg-gray-50 text-gray-300 scale-90'}`}
                  >
-                   <Send size={18} />
+                   <Send size={20} />
                  </button>
               </div>
            </div>
